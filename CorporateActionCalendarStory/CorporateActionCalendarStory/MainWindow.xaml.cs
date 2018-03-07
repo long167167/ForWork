@@ -157,10 +157,10 @@ namespace CorporateActionCalendarStory
                     long parentAvailable = FloatSharesCalculator(parentShareNum, parentFloatNum);
                     long childAvailable = FloatSharesCalculator(childShareNum, childFloatNum);
                     long newShares = MergerShareCalculator(parentAvailable, childAvailable, stockTerms, stockProrationNum);
-                    double newGrowth = 100 * Math.Round(ProbabilityCalculator(StyleShares(parentShareNum, parentGrowthNum), newShares), 3);
-                    double newValue = 100 * Math.Round(ProbabilityCalculator(StyleShares(parentShareNum, parentValueNum), newShares), 3);
-                    double newDefensive = 100 * Math.Round(ProbabilityCalculator(StyleShares(parentShareNum, parentDefensiveNum), newShares), 3);
-                    double newDynamic = 100 * Math.Round(ProbabilityCalculator(StyleShares(parentShareNum, parentDynamicNum), newShares), 3);
+                    double newGrowth = 100 * Math.Round(ProbabilityCalculator(MergerShareCalculator(StyleShares(parentAvailable, parentGrowthNum), childAvailable, stockTerms, childGrowthNum), newShares), 3);
+                    double newValue = 100 -newGrowth;
+                    double newDefensive = 100 * Math.Round(ProbabilityCalculator(MergerShareCalculator(StyleShares(parentAvailable, parentDefensiveNum), childAvailable, stockTerms, childDefensiveNum), newShares), 3);
+                    double newDynamic = 100 - newDefensive;
 
 
                     if (parentSizeDimension == sizeDimension.Other)
@@ -214,7 +214,7 @@ namespace CorporateActionCalendarStory
                         $"will be exchanged for {stockTermsAmount} of a share of {parentCompanyName.Text}. The merger is pending {childCompanyName.Text}'s " +
                         $"shareholder meeting on {meetingDate.Text}. {childCompanyName.Text} will be removed from the " +
                         $"Russell Indexes upon completion of the merger. Based on Russell's current projections, the new share total for {parentCompanyName.Text}" +
-                        $" will be {newShares} shares. The style probabilities are expected " +
+                        $" will be {newShares, 64:N0} shares. The style probabilities are expected " +
                         $"to {change} to {newGrowth}% growth and {newValue}% value and the stability " +
                         $"probabilities are expected to {change} to {newDefensive}% defensive and {newDynamic}% dynamic.";
                         storyResultsBox.Text = corporateActionStory;
@@ -316,7 +316,8 @@ namespace CorporateActionCalendarStory
         }
         public double ProbabilityCalculator(long probabilityShares, long newShares)
         {
-            double newProb = Convert.ToDouble(probabilityShares)/Convert.ToDouble(newShares);
+            double newProb = Convert.ToDouble(probabilityShares);
+            newProb = newProb / Convert.ToDouble(newShares);
             return newProb;
         }
         public long StyleShares(long shares, double probability)
@@ -327,7 +328,14 @@ namespace CorporateActionCalendarStory
         public long MergerShareCalculator(long parentShares, long childShares, double terms, double stockProration)
         {
             //calculate merger shares
-            return Convert.ToInt64(parentShares + Math.Floor(childShares*terms*stockProration));
+            long newShares = Convert.ToInt64(Math.Floor(childShares * terms * stockProration));
+            newShares = parentShares + newShares;
+            return newShares;
+        }
+        public long MergerShareCalculator(long parentShares, long childShares, double probability)
+        {
+            //calculate merger shares
+            return Convert.ToInt64(parentShares + Math.Floor(childShares * probability));
         }
         public long FloatSharesCalculator(long shares, double investibilityWeight)
         {
