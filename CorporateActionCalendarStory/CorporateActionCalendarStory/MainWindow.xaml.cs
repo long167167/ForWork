@@ -195,14 +195,23 @@ namespace CorporateActionCalendarStory
                     else
                     {
                         //Write US-us story
-                        string change = "";
-                        if (StyleShares(parentShareNum, parentValueNum)== 100 * Math.Round(newValue, 3))
+                        string styleChange = "";
+                        if (newValue == 100 * Math.Round(parentValueNum, 3))
                         {
-                            change = "remain constant at";
+                            styleChange = "remain constant at";
                         }
                         else
                         {
-                            change = "change to";
+                            styleChange = "change to";
+                        }
+                        string stabChange = "";
+                        if (newDynamic == 100 * Math.Round(parentDynamicNum, 3))
+                        {
+                            stabChange = "remain constant at";
+                        }
+                        else
+                        {
+                            stabChange = "change to";
                         }
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                         $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
@@ -211,12 +220,12 @@ namespace CorporateActionCalendarStory
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; " +
                         $"{MembershipFinder(parentSizeDimension)}{MembershipFinder(parentSP, parentisGrowth, parentisValue, parentisDefensive, parentisDynamic)}" +
                         $") will acquire {childCompanyName.Text} for stock. In the transaction, each share of {childCompanyName.Text} " +
-                        $"will be exchanged for {stockTermsAmount} of a share of {parentCompanyName.Text}. The merger is pending {childCompanyName.Text}'s " +
+                        $"will be exchanged for {stockTermsAmount.Text} of a share of {parentCompanyName.Text}. The merger is pending {childCompanyName.Text}'s " +
                         $"shareholder meeting on {meetingDate.Text}. {childCompanyName.Text} will be removed from the " +
                         $"Russell Indexes upon completion of the merger. Based on Russell's current projections, the new share total for {parentCompanyName.Text}" +
-                        $" will be {newShares, 64:N0} shares. The style probabilities are expected " +
-                        $"to {change} to {newGrowth}% growth and {newValue}% value and the stability " +
-                        $"probabilities are expected to {change} to {newDefensive}% defensive and {newDynamic}% dynamic.";
+                        $" will be {newShares, 0:N0} shares. The style probabilities are expected " +
+                        $"to {styleChange} {newGrowth}% growth and {newValue}% value and the stability " +
+                        $"probabilities are expected to {stabChange} {newDefensive}% defensive and {newDynamic}% dynamic.";
                         storyResultsBox.Text = corporateActionStory;
                     }
 
