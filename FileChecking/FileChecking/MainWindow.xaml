@@ -1,0 +1,14 @@
+﻿<Window x:Class="FileChecking.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FileChecking"
+        mc:Ignorable="d"
+        Title="File Checker" Height="350" Width="365.4" Cursor="Arrow">
+    <Grid>
+        <Button x:Name="button" Content="Check today's close File" HorizontalAlignment="Left" Margin="169,46,0,0" VerticalAlignment="Top" Width="153" Click="button_Click"/>
+        <TextBox x:Name="DateInput" HorizontalAlignment="Left" Height="20" Margin="21,46,0,0" TextWrapping="Wrap" Text="Date: yyyymmdd" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="filePathInput" HorizontalAlignment="Left" Height="22" Margin="21,10,0,0" TextWrapping="Wrap" Text="Enter a file location" VerticalAlignment="Top" Width="264"/>
+    </Grid>
+</Window>
