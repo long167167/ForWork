@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CorporateActionCalendarStory.exe" size="26080">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CorporateActionCalendarStory.exe" size="38368">
       <assemblyIdentity name="CorporateActionCalendarStory" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>B532zIR+sG6YAyOlAxtPjwPXDB4Ti11Xee3dwcrYpwA=</dsig:DigestValue>
+        <dsig:DigestValue>kKB+4uKKxFo7+4vYkZ9an+U+9/RgKtGxB3S2GCSyWxg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

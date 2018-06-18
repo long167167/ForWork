@@ -665,7 +665,7 @@ namespace CorporateActionCalendarStory
             change,
             remain
         }
-        public double ConvertToDouble(string Input)
+        public static double ConvertToDouble(string Input)
         {
             try
             {
@@ -708,6 +708,72 @@ namespace CorporateActionCalendarStory
             else
                 return false;
         }
-        //public bool CheckFlag()
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var newWindow = new ImportDialog();
+            newWindow.ShowDialog();
+        }
+        public static TablePopulation PopulateTable(string fileLine)
+        {
+            string[] data = fileLine.Split('|');
+            var table = new TablePopulation();
+            table.parentName = data[4];
+            table.parentTicker = data[2];
+            table.parentTSO = data[9];
+            table.parentFloat = $"{(1 - ConvertToDouble(data[11]))}";
+            table.parentSize = data[4];
+            table.parentGrowth = data[15];
+            table.parentDynamic = "";
+            table.parentRSCC = data[22];
+            return table;
+        }
+        public static void PopulateTable(string parentFileLine, string childFileLine)
+        {
+            string[] data = childFileLine.Split('|');
+            var table = new TablePopulation();
+            table = PopulateTable(parentFileLine);
+            table.childName = data[4];
+            table.childTicker = data[2];
+            table.childTSO = data[9];
+            table.childFloat = data[12];
+            table.childSize = data[4];
+            table.childGrowth = data[15];
+            table.childDynamic = data[4];
+            table.childRSCC = data[22];
+            EventPublisher obj = new EventPublisher();
+            obj.haveValues += Obj_haveValues;
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.ShowDialog();
+            mainWindow.DoThis(table);
+            //mainWindow.ShowDialog();
+        }
+
+        private static void Obj_haveValues(TablePopulation table)
+        {
+            
+        }
+        public void DoThis(TablePopulation table)
+        {
+            companyNameChild.Text = table.childName;
+        }
+    }
+    public delegate void OnMyEvent(TablePopulation table);
+    public class EventPublisher
+    {
+        public event OnMyEvent haveValues;
+        public TablePopulation table
+        {
+            set
+            {
+                this.table = value;
+                this.haveValues(table);
+            }
+            get
+            {
+                return table;
+            }
+            
+        }
     }
 }

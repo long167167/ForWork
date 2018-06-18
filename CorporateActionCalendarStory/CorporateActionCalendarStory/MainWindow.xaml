@@ -3,10 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Corporate Action Story Generator" Height="1400" Width="1400">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="289*"/>
-            <ColumnDefinition Width="175*"/>
-        </Grid.ColumnDefinitions>
         <RadioButton x:Name="mergerButton" Content="Merger" HorizontalAlignment="Left" Margin="74,65,0,0" VerticalAlignment="Top" GroupName="actionType" IsChecked="True"/>
         <RadioButton x:Name="tenderOfferButton" Content="Tender Offer" HorizontalAlignment="Left" Margin="74,86,0,0" VerticalAlignment="Top" GroupName="actionType"/>
         <RadioButton x:Name="delistingButton" Content="Delisting" HorizontalAlignment="Left" Margin="74,107,0,0" VerticalAlignment="Top" GroupName="actionType"/>
@@ -24,25 +20,26 @@
         <TextBox x:Name="meetingDate" HorizontalAlignment="Left" Margin="452,111,0,0" TextWrapping="Wrap" Text="November 7, 2018" VerticalAlignment="Top" Width="120"/>
         <TextBlock HorizontalAlignment="Left" Margin="342,136,0,0" TextWrapping="Wrap" Text="Projected to Close" VerticalAlignment="Top"/>
         <TextBox x:Name="closeDate" HorizontalAlignment="Left" Margin="452,134,0,0" TextWrapping="Wrap" Text="First Quarter 2018" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Import Constituents" HorizontalAlignment="Left" Margin="74,148,0,0" VerticalAlignment="Top" Width="146" Click="Button_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="162,248,0,0" TextWrapping="Wrap" Text="Company Name" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="339,247,0,0" TextWrapping="Wrap" Text="Name Suffix" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="464,247,0,0" TextWrapping="Wrap" Text="Ticker" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="520,247,0,0" TextWrapping="Wrap" Text="TSO" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="339,248,0,0" TextWrapping="Wrap" Text="Name Suffix" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="464,248,0,0" TextWrapping="Wrap" Text="Ticker" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="520,248,0,0" TextWrapping="Wrap" Text="TSO" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="645,248,0,0" TextWrapping="Wrap" Text="Float" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="770,248,0,0" TextWrapping="Wrap" Text="Size" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="837,248,0,0" TextWrapping="Wrap" Text="Growth" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
-        <TextBlock HorizontalAlignment="Left" Margin="95,248,0,0" TextWrapping="Wrap" Text="Dynamic" VerticalAlignment="Top" Grid.Column="1"/>
-        <TextBlock x:Name="companyNameParent" HorizontalAlignment="Left" Margin="64,272,0,0" TextWrapping="Wrap" Text="Parent Company" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="962,248,0,0" TextWrapping="Wrap" Text="Dynamic" VerticalAlignment="Top"/>
+        <TextBlock  x:Name="companyNameParent" HorizontalAlignment="Left" Margin="64,272,0,0" TextWrapping="Wrap" Text="Parent Company" VerticalAlignment="Top"/>
         <TextBox x:Name="parentCompanyName" HorizontalAlignment="Left" Margin="162,269,0,0" TextWrapping="Wrap" Text="Apple" VerticalAlignment="Top" Width="172"/>
-        <TextBox x:Name="parentNameSuffix" HorizontalAlignment="Left" Margin="339,268,0,0" TextWrapping="Wrap" Text="Inc." VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="parentNameSuffix" HorizontalAlignment="Left" Margin="339,269,0,0" TextWrapping="Wrap" Text="Inc." VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="parentTicker" HorizontalAlignment="Left" Margin="464,269,0,0" TextWrapping="Wrap" Text="AAPL" VerticalAlignment="Top" Width="50"/>
         <TextBox x:Name="parentTSO" HorizontalAlignment="Left" Margin="520,269,0,0" TextWrapping="Wrap" Text="5074013" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="parentFloat" HorizontalAlignment="Left" Margin="645,269,0,0" TextWrapping="Wrap" Text="0.999287" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="parentSize" HorizontalAlignment="Left" Margin="770,269,0,0" TextWrapping="Wrap" Text="L2" VerticalAlignment="Top" Width="61"/>
         <TextBox x:Name="parentGrowth" HorizontalAlignment="Left" Margin="837,269,0,0" TextWrapping="Wrap" Text="1.000" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
-        <TextBox x:Name="parentDynamic" HorizontalAlignment="Left" Margin="95,269,0,0" TextWrapping="Wrap" Text="0.595" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
-        <CheckBox x:Name="parentSP5" Content="RSCC" HorizontalAlignment="Left" Margin="220,271,0,0" VerticalAlignment="Top" Height="22" IsChecked="True" Grid.Column="1"/>
-        <TextBlock x:Name="companyNameChild" HorizontalAlignment="Left" Margin="64,299,0,0" TextWrapping="Wrap" Text="Child Company" VerticalAlignment="Top"/>
+        <TextBox x:Name="parentDynamic" HorizontalAlignment="Left" Margin="962,269,0,0" TextWrapping="Wrap" Text="0.595" VerticalAlignment="Top" Width="120"/>
+        <CheckBox x:Name="parentSP5" Content="RSCC" HorizontalAlignment="Left" Margin="1087,269,0,0" VerticalAlignment="Top" Height="22" IsChecked="True"/>
+        <TextBlock x:Name="companyNameChild" HorizontalAlignment="Left" Margin="64,296,0,0" TextWrapping="Wrap" Text="Child Company" VerticalAlignment="Top"/>
         <TextBox x:Name="childCompanyName" HorizontalAlignment="Left" Margin="162,296,0,0" TextWrapping="Wrap" Text="Microsoft" VerticalAlignment="Top" Width="172"/>
         <TextBox x:Name="childNameSuffix" HorizontalAlignment="Left" Margin="339,296,0,0" TextWrapping="Wrap" Text="Inc." VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="childTicker" HorizontalAlignment="Left" Margin="464,296,0,0" TextWrapping="Wrap" Text="MSFT" VerticalAlignment="Top" Width="50"/>
@@ -50,10 +47,10 @@
         <TextBox x:Name="childFloat" HorizontalAlignment="Left" Margin="645,296,0,0" TextWrapping="Wrap" Text="0.9" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="childSize" HorizontalAlignment="Left" Margin="770,296,0,0" TextWrapping="Wrap" Text="L1" VerticalAlignment="Top" Width="61"/>
         <TextBox x:Name="childGrowth" HorizontalAlignment="Left" Margin="837,296,0,0" TextWrapping="Wrap" Text="0.500" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2"/>
-        <TextBox x:Name="childDynamic" HorizontalAlignment="Left" Margin="95,296,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120" Grid.Column="1"/>
-        <CheckBox x:Name="childSP5" Content="RSCC" HorizontalAlignment="Left" Margin="220,296,0,0" VerticalAlignment="Top" Height="22" IsChecked="True" Grid.Column="1"/>
+        <TextBox x:Name="childDynamic" HorizontalAlignment="Left" Margin="962,296,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120"/>
+        <CheckBox x:Name="childSP5" Content="RSCC" HorizontalAlignment="Left" Margin="1087,296,0,0" VerticalAlignment="Top" Height="22" IsChecked="True" Grid.Column="1"/>
         <Button x:Name="writeStory" Content="Write my calendar story" HorizontalAlignment="Left" Margin="132,415,0,0" VerticalAlignment="Top" Width="189" Click="writeStory_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="132,442,0,0" TextWrapping="Wrap" Text="R3 Story" VerticalAlignment="Top"/>
-        <TextBlock x:Name="storyResultsBox" HorizontalAlignment="Left" Margin="132,463,0,0" TextWrapping="Wrap" Text="Corporate Action Story" VerticalAlignment="Top" Height="227" Width="575"/>
+        <TextBox x:Name="storyResultsBox" HorizontalAlignment="Left" Margin="132,463,0,0" TextWrapping="Wrap" Text="Corporate Action Story" VerticalAlignment="Top" Height="227" Width="575"/>
     </Grid>
 </Window>

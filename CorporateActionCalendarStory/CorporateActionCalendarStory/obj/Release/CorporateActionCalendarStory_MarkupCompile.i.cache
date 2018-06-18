@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\
+C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Release\
 CorporateActionCalendarStory
 none
 false
-DEBUG;TRACE
+TRACE
 C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\App.xaml
-21687560881
+11151548125
 
-7-1526557929
+91649675083
 131569487696
-ImportDialog.xaml;MainWindow.xaml;
+MainWindow.xaml;
 
 False
 

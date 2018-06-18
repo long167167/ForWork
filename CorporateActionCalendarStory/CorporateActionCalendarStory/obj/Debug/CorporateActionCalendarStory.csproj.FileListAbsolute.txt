@@ -12,3 +12,10 @@ C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\
 C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.csproj.CoreCompileInputs.cache
 C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.exe
 C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.pdb
+C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.exe.manifest
+C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.application
+C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.exe.manifest
+C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.application
+C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\ImportDialog.g.cs
+C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory_MarkupCompile.lref
+C:\source\ForWork\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\ImportDialog.baml
