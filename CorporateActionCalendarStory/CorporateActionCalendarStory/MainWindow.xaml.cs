@@ -78,7 +78,6 @@ namespace CorporateActionCalendarStory
                         //write story for non-member
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                            $"; {MembershipFinder(child.SizeDimension)}" +
                             $"{MembershipFinder(child)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Not in the Russell indexes) will acquire " +
                             $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
@@ -92,7 +91,6 @@ namespace CorporateActionCalendarStory
                         //Write Global story
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                            $"; {MembershipFinder(child.SizeDimension)}" +
                             $"{MembershipFinder(child)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Non-US Russell Index Member) will acquire " +
                             $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
@@ -106,7 +104,6 @@ namespace CorporateActionCalendarStory
                         //Write US story
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                         $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                        $"; {MembershipFinder(child.SizeDimension)}" +
                         $"{MembershipFinder(child)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Russell Index Member) will acquire " +
                         $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
@@ -134,7 +131,6 @@ namespace CorporateActionCalendarStory
                         //write story for acquired by non-member
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                            $"; {MembershipFinder(child.SizeDimension)}" +
                             $"{MembershipFinder(child)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Not in the Russell indexes) " +
                             $"will acquire {childCompanyName.Text} for stock. In the transaction, each share of {childCompanyName.Text} " +
@@ -149,7 +145,6 @@ namespace CorporateActionCalendarStory
                         //Write acquired by  Global story
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                            $"; {MembershipFinder(child.SizeDimension)}" +
                             $"{MembershipFinder(child)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Non-US Russell Index Member) will acquire " +
                             $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
@@ -181,10 +176,9 @@ namespace CorporateActionCalendarStory
                         }
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                         $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                        $"; {MembershipFinder(child.SizeDimension)}" +
                         $"{MembershipFinder(child)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; " +
-                        $"{MembershipFinder(parent.SizeDimension)}{MembershipFinder(parent)}" +
+                        $"{MembershipFinder(parent)}" +
                         $") will acquire {childCompanyName.Text} for stock. In the transaction, each share of {childCompanyName.Text} " +
                         $"will be exchanged for {stockTermsAmount.Text} of a share of {parentCompanyName.Text}. The merger is pending {childCompanyName.Text}'s " +
                         $"shareholder meeting on {meetingDate.Text}. {childCompanyName.Text} will be removed from the " +
@@ -233,7 +227,6 @@ namespace CorporateActionCalendarStory
                     //write story for acquired by non-member
 
                     string corporateActionStory = $"{childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                        $"; {MembershipFinder(child.SizeDimension)}" +
                         $"{MembershipFinder(child)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Not in the Russell indexes) will acquire " +
                         $"{childCompanyName.Text} through a cash tender offer. In the transaction, each share of {childCompanyName.Text} " +
@@ -246,7 +239,6 @@ namespace CorporateActionCalendarStory
                 {
                     //Write acquired by  Global story
                     string corporateActionStory = $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                        $"; {MembershipFinder(child.SizeDimension)}" +
                         $"{MembershipFinder(child)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Non-US Russell Index Member) will acquire " +
                         $"{childCompanyName.Text} through a cash tender offer. In the transaction, each share of {childCompanyName.Text} " +
@@ -259,7 +251,6 @@ namespace CorporateActionCalendarStory
                 {
                     //Write US-us story
                     string corporateActionStory = $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                    $"; {MembershipFinder(child.SizeDimension)}" +
                     $"{MembershipFinder(child)}): " +
                     $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; " +
                     $"Russell Index Member) will acquire " +
@@ -352,7 +343,7 @@ namespace CorporateActionCalendarStory
         }
         public string MembershipFinder(StockInputs inputs)
         {
-            string returnValue = "";
+            string returnValue = MembershipFinder(inputs.SizeDimension);
             if (inputs.RSCC)
             {
                 returnValue += ", RS";
