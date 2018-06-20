@@ -46,26 +46,6 @@ namespace CorporateActionCalendarStory
                 andOr = AndOrSymbol.or;
             else
                 MessageBox.Show("You should not see this message");
-            //sizeDimension parent.SizeDimension = sizeDimension.Other;
-            //sizeDimension child.SizeDimension = sizeDimension.Other;
-            //try
-            //{
-            //    parent.SizeDimension = (sizeDimension)Enum.Parse(typeof(sizeDimension), parentSize.Text);
-            //}
-            //catch (Exception)
-            //{
-            //    parent.SizeDimension = sizeDimension.Other;
-            //}
-            //try
-            //{
-            //    child.SizeDimension = (sizeDimension)Enum.Parse(typeof(sizeDimension), childSize.Text);
-            //}
-            //catch (Exception)
-            //{
-            //    child.SizeDimension = sizeDimension.Other;
-            //}
-
-
 
 
             //add switch statement for Radio Button selection
@@ -362,9 +342,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                         else
                         {
@@ -374,9 +352,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                     }
                     else
@@ -390,9 +366,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                         else
                         {
@@ -402,9 +376,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                     }
                 }
@@ -422,9 +394,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                         else
                         {
@@ -434,9 +404,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                     }
                     else
@@ -450,9 +418,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                         else
                         {
@@ -462,9 +428,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                     }
                 }
@@ -486,9 +450,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                         else
                         {
@@ -498,9 +460,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                     }
                     else
@@ -514,9 +474,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                         else
                         {
@@ -526,9 +484,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                     }
                 }
@@ -546,9 +502,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                         else
                         {
@@ -558,9 +512,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                     }
                     else
@@ -574,9 +526,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                         else
                         {
@@ -586,9 +536,7 @@ namespace CorporateActionCalendarStory
                                 return returnValue;
                             }
                             else
-                            {
                                 return returnValue;
-                            }
                         }
                     }
                 }
@@ -627,9 +575,7 @@ namespace CorporateActionCalendarStory
             try
             {
                 if (Convert.ToDouble(Input)<= 1)
-                {
                     return Convert.ToDouble(Input);
-                }
                 else
                 {
                     MessageBox.Show("Style/Stabilty Ratios, float and proration must be between 0 and 1");
