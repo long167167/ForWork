@@ -28,7 +28,7 @@ namespace CorporateActionCalendarStory
 
         private void btnImport_Click(object sender, RoutedEventArgs e)
         {
-            //write code to import
+            //Call the Constituent Import method using the user input text fields
             ConstituentImport(txtParentTicker.Text, txtChildTicker.Text);
             this.Close();
         }
@@ -41,53 +41,36 @@ namespace CorporateActionCalendarStory
         }
         public void ConstituentImport(string parentTicker, string childTicker)
         {
-            //Open File
+            //Display dialog for the user to choose a CA notebook file
             OpenFileDialog dlg = new OpenFileDialog()
             {
                 DefaultExt = ".txt", Filter = "TXT Files (*.txt)|*.txt|PRN Files (*.prn)|*.prn|CSV Files (*.csv)|*.csv", Title = "Choose a CA Notebook File."
             };
             Nullable<bool> result = dlg.ShowDialog();
-            //Search for line
+            //Search the selected CA notebook for the two input tickers
             using (StreamReader sr = File.OpenText(dlg.FileName))
             {
-                string s1 = SearchFile(parentTicker, sr);
+                string s1 = SearchFile(parentTicker, sr); //search for the parent ticker
                 string s2 = String.Empty;
-                if (s1 == String.Empty)
+                if (s1 == String.Empty) //logic for only gather one constituent
                 {
                     MessageBox.Show("The provided parent ticker was not found in the file.", "Error: Ticker not found");
                 }
-                if (childTicker != String.Empty)
+                if (childTicker != String.Empty)//logic for importing child
                 {
-                    s2 = SearchFile(childTicker, sr);
+                    s2 = SearchFile(childTicker, sr);//search for child ticker
                     if (s1 == String.Empty)
                     {
                         MessageBox.Show("The provided child ticker was not found in the file.", "Error: Ticker not found");
                     }
-                    MainWindow.PopulateTable(s1, s2);
+                    PopulateTable(s1, s2); //populate both if two tickers were entered
                 }
                 else
                 {
-                    MainWindow.PopulateTable(s1);
+                    PopulateTable(s1);//populate the table if only one ticker was entered
                 }
             }
-            //populate table
         }
-        /*
-        public static void PopulateTable(string fileLine)
-        {
-            string[] data = fileLine.Split('|');
-            MainWindow mainWindow = Own
-        }
-        public static void PopulateTable(string fileLineParent, string fileLineChild)
-        {
-            PopulateTable(fileLineParent);
-            //populate the table 
-        }
-        public void ClearChild()
-        {
-            //Clear the text boxes for the child
-        }
-        */
         public string SearchFile(string ticker, StreamReader sr)
         {
             string s = String.Empty;
@@ -101,6 +84,45 @@ namespace CorporateActionCalendarStory
             return String.Empty;
 
         }
-        
+        public static void PopulateTable(string fileLine)
+        {
+            string[] data = fileLine.Split('|');
+            ((MainWindow)Application.Current.MainWindow).parentCompanyName.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).parentTicker.Text = data[2];
+            ((MainWindow)Application.Current.MainWindow).parentTSO.Text = data[9];
+            ((MainWindow)Application.Current.MainWindow).parentFloat.Text = $"{(1 - MainWindow.ConvertToDouble(data[11]))}";
+            ((MainWindow)Application.Current.MainWindow).parentSize.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).parentGrowth.Text = data[15];
+            ((MainWindow)Application.Current.MainWindow).parentDynamic.Text = "";
+            if (data[22] == "Y")
+            {
+                ((MainWindow)Application.Current.MainWindow).parentSP5.IsChecked = true;
+            }
+            else
+            {
+                ((MainWindow)Application.Current.MainWindow).parentSP5.IsChecked = false;
+            }
+        }
+        public static void PopulateTable(string parentFileLine, string childFileLine)
+        {
+            string[] data = childFileLine.Split('|');
+            var table = new TablePopulation();
+            PopulateTable(parentFileLine);
+            ((MainWindow)Application.Current.MainWindow).childCompanyName.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).childTicker.Text = data[2];
+            ((MainWindow)Application.Current.MainWindow).childTSO.Text = data[9];
+            ((MainWindow)Application.Current.MainWindow).childFloat.Text = data[12];
+            ((MainWindow)Application.Current.MainWindow).childSize.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).childGrowth.Text = data[15];
+            ((MainWindow)Application.Current.MainWindow).childDynamic.Text = data[4];
+            if (data[22] == "Y")
+            {
+                ((MainWindow)Application.Current.MainWindow).childSP5.IsChecked = true;
+            }
+            else
+            {
+                ((MainWindow)Application.Current.MainWindow).childSP5.IsChecked = false;
+            }
+        }
     }
 }

@@ -1,4 +1,3 @@
 # ForWork
-Everything currently good for US-US stock merger.
-Finish the other stock merger scenarios
-Maybe this works
+This is how you update the main window from the popup
+((MainWindow)Application.Current.MainWindow).parentCompanyName.Text
