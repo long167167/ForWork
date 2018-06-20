@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CorporateActionCalendarStory;
 
 namespace CorporateActionCalendarStory
 {
@@ -28,6 +29,8 @@ namespace CorporateActionCalendarStory
         private void writeStory_Click(object sender, RoutedEventArgs e)
         {
             var parent = new StockInputs();
+            var child = new StockInputs();
+            GetStockInputs(ref parent, true);
             //Get all the inputs and check them
             bool isCash = !String.IsNullOrWhiteSpace(cashTermsAmount.Text);
             bool isStock = !String.IsNullOrWhiteSpace(stockTermsAmount.Text);
@@ -43,8 +46,8 @@ namespace CorporateActionCalendarStory
             double childDefensiveNum = 1- ConvertToDouble(childDynamic.Text);
             double childFloatNum = ConvertToDouble(childFloat.Text);
             //Take in S&P flags
-            bool parentSP = CheckSP(parentSP5.IsChecked);
-            bool childSP = CheckSP(childSP5.IsChecked);
+            bool parentRSCC = CheckSP(parentSP5.IsChecked);
+            bool childRSCC = CheckSP(childSP5.IsChecked);
             //Check TSO
             long parentShareNum = ConvertToLong(parentTSO.Text);
             long childShareNum = ConvertToLong(childTSO.Text);
@@ -114,7 +117,7 @@ namespace CorporateActionCalendarStory
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
                             $"; {MembershipFinder(childSizeDimension)}" +
-                            $"{MembershipFinder(childSP, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                            $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Not in the Russell indexes) will acquire " +
                             $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
                             $"will be exchanged for {cashTermsAmount.Text} in cash. The merger is pending {childCompanyName.Text}'s " +
@@ -128,7 +131,7 @@ namespace CorporateActionCalendarStory
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
                             $"; {MembershipFinder(childSizeDimension)}" +
-                            $"{MembershipFinder(childSP, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                            $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Non-US Russell Index Member) will acquire " +
                             $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
                             $"will be exchanged for {cashTermsAmount.Text} in cash. The merger is pending {childCompanyName.Text}'s " +
@@ -142,7 +145,7 @@ namespace CorporateActionCalendarStory
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                         $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
                         $"; {MembershipFinder(childSizeDimension)}" +
-                        $"{MembershipFinder(childSP, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                        $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Russell Index Member) will acquire " +
                         $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
                         $"will be exchanged for {cashTermsAmount.Text} in cash. The merger is pending {childCompanyName.Text}'s " +
@@ -170,7 +173,7 @@ namespace CorporateActionCalendarStory
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
                             $"; {MembershipFinder(childSizeDimension)}" +
-                            $"{MembershipFinder(childSP, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                            $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Not in the Russell indexes) " +
                             $"will acquire {childCompanyName.Text} for stock. In the transaction, each share of {childCompanyName.Text} " +
                             $"will be exchanged for {stockTermsAmount.Text} of a share of {parentCompanyName.Text}. " +
@@ -185,7 +188,7 @@ namespace CorporateActionCalendarStory
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
                             $"; {MembershipFinder(childSizeDimension)}" +
-                            $"{MembershipFinder(childSP, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                            $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Non-US Russell Index Member) will acquire " +
                             $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
                             $"will be exchanged for {cashTermsAmount.Text} in cash. The merger is pending {childCompanyName.Text}'s " +
@@ -217,9 +220,9 @@ namespace CorporateActionCalendarStory
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                         $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
                         $"; {MembershipFinder(childSizeDimension)}" +
-                        $"{MembershipFinder(childSP, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                        $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; " +
-                        $"{MembershipFinder(parentSizeDimension)}{MembershipFinder(parentSP, parentisGrowth, parentisValue, parentisDefensive, parentisDynamic)}" +
+                        $"{MembershipFinder(parentSizeDimension)}{MembershipFinder(parentRSCC, parentisGrowth, parentisValue, parentisDefensive, parentisDynamic)}" +
                         $") will acquire {childCompanyName.Text} for stock. In the transaction, each share of {childCompanyName.Text} " +
                         $"will be exchanged for {stockTermsAmount.Text} of a share of {parentCompanyName.Text}. The merger is pending {childCompanyName.Text}'s " +
                         $"shareholder meeting on {meetingDate.Text}. {childCompanyName.Text} will be removed from the " +
@@ -269,7 +272,7 @@ namespace CorporateActionCalendarStory
 
                     string corporateActionStory = $"{childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
                         $"; {MembershipFinder(childSizeDimension)}" +
-                        $"{MembershipFinder(childSP, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                        $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Not in the Russell indexes) will acquire " +
                         $"{childCompanyName.Text} through a cash tender offer. In the transaction, each share of {childCompanyName.Text} " +
                         $"will be exchanged for {cashTermsAmount.Text} in cash. The offer is set to expire on " +
@@ -282,7 +285,7 @@ namespace CorporateActionCalendarStory
                     //Write acquired by  Global story
                     string corporateActionStory = $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
                         $"; {MembershipFinder(childSizeDimension)}" +
-                        $"{MembershipFinder(childSP, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                        $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Non-US Russell Index Member) will acquire " +
                         $"{childCompanyName.Text} through a cash tender offer. In the transaction, each share of {childCompanyName.Text} " +
                         $"will be exchanged for {cashTermsAmount.Text} in cash. The offer is set to expire on " +
@@ -295,7 +298,7 @@ namespace CorporateActionCalendarStory
                     //Write US-us story
                     string corporateActionStory = $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
                     $"; {MembershipFinder(childSizeDimension)}" +
-                    $"{MembershipFinder(childSP, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                    $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
                     $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; " +
                     $"Russell Index Member) will acquire " +
                     $"{childCompanyName.Text} through a cash tender offer. In the transaction, each share of {childCompanyName.Text} " +
@@ -715,9 +718,25 @@ namespace CorporateActionCalendarStory
             newWindow.ShowDialog();
         }
 
-        public static StockInputs GetStockInputs(ref StockInputs input)
+        public static StockInputs GetStockInputs(ref StockInputs input, bool Parent)
         {
-            input.GrowthNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).parentGrowth.Text);
+            if (Parent)
+            {
+                input.GrowthNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).parentGrowth.Text);
+                input.ValueNum = 1 - input.GrowthNum;
+                input.DynamicNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).parentDynamic.Text);
+                input.DefensiveNum = input.DynamicNum;
+                input.FloatNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).parentFloat.Text);
+            }
+            else
+            {
+                input.GrowthNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).childGrowth.Text);
+                input.ValueNum = 1 - input.GrowthNum;
+                input.DynamicNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).childDynamic.Text);
+                input.DefensiveNum = input.DynamicNum;
+                input.FloatNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).childFloat.Text);
+            }
+            
             return input;
         }
     }

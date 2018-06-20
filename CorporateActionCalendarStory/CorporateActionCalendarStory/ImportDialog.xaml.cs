@@ -29,8 +29,12 @@ namespace CorporateActionCalendarStory
         private void btnImport_Click(object sender, RoutedEventArgs e)
         {
             //Call the Constituent Import method using the user input text fields
-            ConstituentImport(txtParentTicker.Text, txtChildTicker.Text);
-            this.Close();
+            bool Success = false;
+            Success = ConstituentImport(txtParentTicker.Text, txtChildTicker.Text);
+            if (Success)
+            {
+                this.Close();
+            }
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
@@ -39,7 +43,7 @@ namespace CorporateActionCalendarStory
             this.Close();
             
         }
-        public void ConstituentImport(string parentTicker, string childTicker)
+        public bool ConstituentImport(string parentTicker, string childTicker)
         {
             //Display dialog for the user to choose a CA notebook file
             OpenFileDialog dlg = new OpenFileDialog()
@@ -48,27 +52,51 @@ namespace CorporateActionCalendarStory
             };
             Nullable<bool> result = dlg.ShowDialog();
             //Search the selected CA notebook for the two input tickers
+            string s1 = String.Empty;
+            string s2 = String.Empty;
             using (StreamReader sr = File.OpenText(dlg.FileName))
             {
-                string s1 = SearchFile(parentTicker, sr); //search for the parent ticker
-                string s2 = String.Empty;
-                if (s1 == String.Empty) //logic for only gather one constituent
+                if (parentTicker != String.Empty)
                 {
-                    MessageBox.Show("The provided parent ticker was not found in the file.", "Error: Ticker not found");
-                }
-                if (childTicker != String.Empty)//logic for importing child
-                {
-                    s2 = SearchFile(childTicker, sr);//search for child ticker
-                    if (s1 == String.Empty)
+                    s1 = SearchFile(parentTicker, sr); //search for the parent ticker
+                    if (s1 == String.Empty) //If the ticker is not found
                     {
-                        MessageBox.Show("The provided child ticker was not found in the file.", "Error: Ticker not found");
+                        MessageBox.Show("The provided parent ticker was not found in the file.", "Error: Ticker not found");
+                        return false;
                     }
-                    PopulateTable(s1, s2); //populate both if two tickers were entered
                 }
                 else
                 {
-                    PopulateTable(s1);//populate the table if only one ticker was entered
+                    MessageBox.Show("You must import a parent ticker.", "Parent Needed");
+                    return false;
                 }
+            }
+            using (StreamReader sr = File.OpenText(dlg.FileName))
+            {
+                if (childTicker != String.Empty)//logic for importing child
+                {
+                    s2 = SearchFile(childTicker, sr);//search for child ticker
+                    if (s2 == String.Empty)
+                    {
+                        MessageBox.Show("The provided child ticker was not found in the file.", "Error: Ticker not found");
+                        return false;
+                    }
+                }
+            }
+            if (s1!= string.Empty && s2!=string.Empty)
+            {
+                PopulateTable(s1, s2);
+                return true;
+            }
+            else if (s1 != string.Empty)
+            {
+                PopulateTable(s1);
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("Please enter a valid ticker", "Invalid Tickers Entered.");
+                return false;
             }
         }
         public string SearchFile(string ticker, StreamReader sr)
