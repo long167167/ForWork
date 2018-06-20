@@ -27,6 +27,7 @@ namespace CorporateActionCalendarStory
 
         private void writeStory_Click(object sender, RoutedEventArgs e)
         {
+            var parent = new StockInputs();
             //Get all the inputs and check them
             bool isCash = !String.IsNullOrWhiteSpace(cashTermsAmount.Text);
             bool isStock = !String.IsNullOrWhiteSpace(stockTermsAmount.Text);
@@ -752,6 +753,11 @@ namespace CorporateActionCalendarStory
             {
                 ((MainWindow)Application.Current.MainWindow).childSP5.IsChecked = false;
             }
+        }
+        public static StockInputs GetStockInputs(ref StockInputs input)
+        {
+            input.GrowthNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).parentGrowth.Text);
+            return input;
         }
     }
 
