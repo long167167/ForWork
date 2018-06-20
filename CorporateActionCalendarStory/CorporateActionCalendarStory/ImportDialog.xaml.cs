@@ -28,7 +28,7 @@ namespace CorporateActionCalendarStory
 
         private void btnImport_Click(object sender, RoutedEventArgs e)
         {
-            //write code to import
+            //Call the Constituent Import method using the user input text fields
             ConstituentImport(txtParentTicker.Text, txtChildTicker.Text);
             this.Close();
         }
@@ -41,33 +41,33 @@ namespace CorporateActionCalendarStory
         }
         public void ConstituentImport(string parentTicker, string childTicker)
         {
-            //Open File
+            //Display dialog for the user to choose a CA notebook file
             OpenFileDialog dlg = new OpenFileDialog()
             {
                 DefaultExt = ".txt", Filter = "TXT Files (*.txt)|*.txt|PRN Files (*.prn)|*.prn|CSV Files (*.csv)|*.csv", Title = "Choose a CA Notebook File."
             };
             Nullable<bool> result = dlg.ShowDialog();
-            //Search for line
+            //Search the selected CA notebook for the two input tickers
             using (StreamReader sr = File.OpenText(dlg.FileName))
             {
-                string s1 = SearchFile(parentTicker, sr);
+                string s1 = SearchFile(parentTicker, sr); //search for the parent ticker
                 string s2 = String.Empty;
-                if (s1 == String.Empty)
+                if (s1 == String.Empty) //logic for only gather one constituent
                 {
                     MessageBox.Show("The provided parent ticker was not found in the file.", "Error: Ticker not found");
                 }
-                if (childTicker != String.Empty)
+                if (childTicker != String.Empty)//logic for importing child
                 {
-                    s2 = SearchFile(childTicker, sr);
+                    s2 = SearchFile(childTicker, sr);//search for child ticker
                     if (s1 == String.Empty)
                     {
                         MessageBox.Show("The provided child ticker was not found in the file.", "Error: Ticker not found");
                     }
-                    PopulateTable(s1, s2);
+                    PopulateTable(s1, s2); //populate both if two tickers were entered
                 }
                 else
                 {
-                    PopulateTable(s1);
+                    PopulateTable(s1);//populate the table if only one ticker was entered
                 }
             }
         }
