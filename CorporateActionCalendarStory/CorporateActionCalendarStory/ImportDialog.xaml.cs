@@ -70,24 +70,7 @@ namespace CorporateActionCalendarStory
                     MainWindow.PopulateTable(s1);
                 }
             }
-            //populate table
         }
-        /*
-        public static void PopulateTable(string fileLine)
-        {
-            string[] data = fileLine.Split('|');
-            MainWindow mainWindow = Own
-        }
-        public static void PopulateTable(string fileLineParent, string fileLineChild)
-        {
-            PopulateTable(fileLineParent);
-            //populate the table 
-        }
-        public void ClearChild()
-        {
-            //Clear the text boxes for the child
-        }
-        */
         public string SearchFile(string ticker, StreamReader sr)
         {
             string s = String.Empty;

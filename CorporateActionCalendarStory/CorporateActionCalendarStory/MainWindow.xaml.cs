@@ -708,72 +708,51 @@ namespace CorporateActionCalendarStory
             else
                 return false;
         }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var newWindow = new ImportDialog();
             newWindow.ShowDialog();
         }
-        public static TablePopulation PopulateTable(string fileLine)
+        public static void PopulateTable(string fileLine)
         {
             string[] data = fileLine.Split('|');
-            var table = new TablePopulation();
-            table.parentName = data[4];
-            table.parentTicker = data[2];
-            table.parentTSO = data[9];
-            table.parentFloat = $"{(1 - ConvertToDouble(data[11]))}";
-            table.parentSize = data[4];
-            table.parentGrowth = data[15];
-            table.parentDynamic = "";
-            table.parentRSCC = data[22];
-            return table;
+            ((MainWindow)Application.Current.MainWindow).parentCompanyName.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).parentTicker.Text = data[2];
+            ((MainWindow)Application.Current.MainWindow).parentTSO.Text = data[9];
+            ((MainWindow)Application.Current.MainWindow).parentFloat.Text = $"{(1 - ConvertToDouble(data[11]))}";
+            ((MainWindow)Application.Current.MainWindow).parentSize.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).parentGrowth.Text = data[15];
+            ((MainWindow)Application.Current.MainWindow).parentDynamic.Text = "";
+            if (data[22]=="Y")
+            {
+                ((MainWindow)Application.Current.MainWindow).parentSP5.IsChecked = true;
+            }
+            else
+            {
+                ((MainWindow)Application.Current.MainWindow).parentSP5.IsChecked = false;
+            }
         }
         public static void PopulateTable(string parentFileLine, string childFileLine)
         {
             string[] data = childFileLine.Split('|');
             var table = new TablePopulation();
-            table = PopulateTable(parentFileLine);
-            table.childName = data[4];
-            table.childTicker = data[2];
-            table.childTSO = data[9];
-            table.childFloat = data[12];
-            table.childSize = data[4];
-            table.childGrowth = data[15];
-            table.childDynamic = data[4];
-            table.childRSCC = data[22];
-            EventPublisher obj = new EventPublisher();
-            obj.haveValues += Obj_haveValues;
-            MainWindow mainWindow = new MainWindow();
-            mainWindow.ShowDialog();
-            mainWindow.DoThis(table);
-            //mainWindow.ShowDialog();
+            PopulateTable(parentFileLine);
+            ((MainWindow)Application.Current.MainWindow).childCompanyName.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).childTicker.Text = data[2];
+            ((MainWindow)Application.Current.MainWindow).childTSO.Text = data[9];
+            ((MainWindow)Application.Current.MainWindow).childFloat.Text = data[12];
+            ((MainWindow)Application.Current.MainWindow).childSize.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).childGrowth.Text = data[15];
+            ((MainWindow)Application.Current.MainWindow).childDynamic.Text = data[4];
+            if (data[22] == "Y")
+            {
+                ((MainWindow)Application.Current.MainWindow).childSP5.IsChecked = true;
+            }
+            else
+            {
+                ((MainWindow)Application.Current.MainWindow).childSP5.IsChecked = false;
+            }
         }
+    }
 
-        private static void Obj_haveValues(TablePopulation table)
-        {
-            
-        }
-        public void DoThis(TablePopulation table)
-        {
-            companyNameChild.Text = table.childName;
-        }
-    }
-    public delegate void OnMyEvent(TablePopulation table);
-    public class EventPublisher
-    {
-        public event OnMyEvent haveValues;
-        public TablePopulation table
-        {
-            set
-            {
-                this.table = value;
-                this.haveValues(table);
-            }
-            get
-            {
-                return table;
-            }
-            
-        }
-    }
 }
