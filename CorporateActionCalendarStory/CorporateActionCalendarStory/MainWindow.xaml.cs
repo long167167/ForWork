@@ -31,48 +31,10 @@ namespace CorporateActionCalendarStory
             var parent = new StockInputs();
             var child = new StockInputs();
             GetStockInputs(ref parent, true);
+            GetStockInputs(ref child, false);
             //Get all the inputs and check them
             bool isCash = !String.IsNullOrWhiteSpace(cashTermsAmount.Text);
             bool isStock = !String.IsNullOrWhiteSpace(stockTermsAmount.Text);
-            //take in probabilities and float
-            double parentGrowthNum = ConvertToDouble(parentGrowth.Text);
-            double parentValueNum = 1-ConvertToDouble(parentGrowth.Text);
-            double parentDynamicNum = ConvertToDouble(parentDynamic.Text);
-            double parentDefensiveNum = 1- ConvertToDouble(parentDynamic.Text);
-            double parentFloatNum = ConvertToDouble(parentFloat.Text);
-            double childGrowthNum = ConvertToDouble(childGrowth.Text);
-            double childValueNum = 1-ConvertToDouble(childGrowth.Text);
-            double childDynamicNum = ConvertToDouble(childDynamic.Text);
-            double childDefensiveNum = 1- ConvertToDouble(childDynamic.Text);
-            double childFloatNum = ConvertToDouble(childFloat.Text);
-            //Take in S&P flags
-            bool parentRSCC = CheckSP(parentSP5.IsChecked);
-            bool childRSCC = CheckSP(childSP5.IsChecked);
-            //Check TSO
-            long parentShareNum = ConvertToLong(parentTSO.Text);
-            long childShareNum = ConvertToLong(childTSO.Text);
-            //Take stock terms
-            double stockTerms = 0.00;
-            try
-            {
-                stockTerms = Convert.ToDouble(stockTermsAmount.Text);
-            }
-            catch (Exception)
-            {
-                stockTerms = 0.000;
-            }
-            //Get proration
-            double cashProrationNum = ConvertToDouble(cashProration.Text);
-            double stockProrationNum = ConvertToDouble(stockProration.Text);
-            //Determin Style/Stab
-            bool parentisGrowth = IsOne(parentGrowthNum);
-            bool parentisValue = IsOne(parentValueNum);
-            bool parentisDefensive = IsOne(parentDefensiveNum);
-            bool parentisDynamic = IsOne(parentDynamicNum);
-            bool childisGrowth = IsOne(childGrowthNum);
-            bool childisValue = IsOne(childValueNum);
-            bool childisDefensive = IsOne(childDefensiveNum);
-            bool childisDynamic = IsOne(childDynamicNum);
 
             //Find Cash and/orStock
             AndOrSymbol andOr = AndOrSymbol.neither;
@@ -84,24 +46,24 @@ namespace CorporateActionCalendarStory
                 andOr = AndOrSymbol.or;
             else
                 MessageBox.Show("You should not see this message");
-            sizeDimension parentSizeDimension = sizeDimension.Other;
-            sizeDimension childSizeDimension = sizeDimension.Other;
-            try
-            {
-                parentSizeDimension = (sizeDimension)Enum.Parse(typeof(sizeDimension), parentSize.Text);
-            }
-            catch (Exception)
-            {
-                parentSizeDimension = sizeDimension.Other;
-            }
-            try
-            {
-                childSizeDimension = (sizeDimension)Enum.Parse(typeof(sizeDimension), childSize.Text);
-            }
-            catch (Exception)
-            {
-                childSizeDimension = sizeDimension.Other;
-            }
+            //sizeDimension parent.SizeDimension = sizeDimension.Other;
+            //sizeDimension child.SizeDimension = sizeDimension.Other;
+            //try
+            //{
+            //    parent.SizeDimension = (sizeDimension)Enum.Parse(typeof(sizeDimension), parentSize.Text);
+            //}
+            //catch (Exception)
+            //{
+            //    parent.SizeDimension = sizeDimension.Other;
+            //}
+            //try
+            //{
+            //    child.SizeDimension = (sizeDimension)Enum.Parse(typeof(sizeDimension), childSize.Text);
+            //}
+            //catch (Exception)
+            //{
+            //    child.SizeDimension = sizeDimension.Other;
+            //}
 
 
 
@@ -111,13 +73,13 @@ namespace CorporateActionCalendarStory
             {
                 if (isCash && !isStock)
                 {
-                    if (parentSizeDimension == sizeDimension.Other)
+                    if (parent.SizeDimension == sizeDimension.Other)
                     {
                         //write story for non-member
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                            $"; {MembershipFinder(childSizeDimension)}" +
-                            $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                            $"; {MembershipFinder(child.SizeDimension)}" +
+                            $"{MembershipFinder(child)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Not in the Russell indexes) will acquire " +
                             $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
                             $"will be exchanged for {cashTermsAmount.Text} in cash. The merger is pending {childCompanyName.Text}'s " +
@@ -125,13 +87,13 @@ namespace CorporateActionCalendarStory
                             $"Russell Indexes upon completion of the merger.";
                         storyResultsBox.Text = corporateActionStory;
                     }
-                    else if (parentSizeDimension == sizeDimension.Global)
+                    else if (parent.SizeDimension == sizeDimension.Global)
                     {
                         //Write Global story
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                            $"; {MembershipFinder(childSizeDimension)}" +
-                            $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                            $"; {MembershipFinder(child.SizeDimension)}" +
+                            $"{MembershipFinder(child)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Non-US Russell Index Member) will acquire " +
                             $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
                             $"will be exchanged for {cashTermsAmount.Text} in cash. The merger is pending {childCompanyName.Text}'s " +
@@ -144,8 +106,8 @@ namespace CorporateActionCalendarStory
                         //Write US story
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                         $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                        $"; {MembershipFinder(childSizeDimension)}" +
-                        $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                        $"; {MembershipFinder(child.SizeDimension)}" +
+                        $"{MembershipFinder(child)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Russell Index Member) will acquire " +
                         $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
                         $"will be exchanged for {cashTermsAmount.Text} in cash. The merger is pending {childCompanyName.Text}'s " +
@@ -158,22 +120,22 @@ namespace CorporateActionCalendarStory
                 else if (!isCash && isStock)
                 {
                     MessageBox.Show("Stock Merger");
-                    long parentAvailable = FloatSharesCalculator(parentShareNum, parentFloatNum);
-                    long childAvailable = FloatSharesCalculator(childShareNum, childFloatNum);
-                    long newShares = MergerShareCalculator(parentAvailable, childAvailable, stockTerms, stockProrationNum);
-                    double newGrowth = 100 * Math.Round(ProbabilityCalculator(MergerShareCalculator(StyleShares(parentAvailable, parentGrowthNum), childAvailable, stockTerms, childGrowthNum), newShares), 3);
+                    long parentAvailable = FloatSharesCalculator(parent.ShareNum, parent.FloatNum);
+                    long childAvailable = FloatSharesCalculator(child.ShareNum, child.FloatNum);
+                    long newShares = MergerShareCalculator(parentAvailable, childAvailable, parent.StockTerms, parent.StockProrationNum);
+                    double newGrowth = 100 * Math.Round(ProbabilityCalculator(MergerShareCalculator(StyleShares(parentAvailable, parent.GrowthNum), childAvailable, parent.StockTerms, child.GrowthNum), newShares), 3);
                     double newValue = 100 -newGrowth;
-                    double newDefensive = 100 * Math.Round(ProbabilityCalculator(MergerShareCalculator(StyleShares(parentAvailable, parentDefensiveNum), childAvailable, stockTerms, childDefensiveNum), newShares), 3);
+                    double newDefensive = 100 * Math.Round(ProbabilityCalculator(MergerShareCalculator(StyleShares(parentAvailable, parent.DefensiveNum), childAvailable, parent.StockTerms, child.DefensiveNum), newShares), 3);
                     double newDynamic = 100 - newDefensive;
 
 
-                    if (parentSizeDimension == sizeDimension.Other)
+                    if (parent.SizeDimension == sizeDimension.Other)
                     {
                         //write story for acquired by non-member
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                            $"; {MembershipFinder(childSizeDimension)}" +
-                            $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                            $"; {MembershipFinder(child.SizeDimension)}" +
+                            $"{MembershipFinder(child)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Not in the Russell indexes) " +
                             $"will acquire {childCompanyName.Text} for stock. In the transaction, each share of {childCompanyName.Text} " +
                             $"will be exchanged for {stockTermsAmount.Text} of a share of {parentCompanyName.Text}. " +
@@ -182,13 +144,13 @@ namespace CorporateActionCalendarStory
                             $"Russell Indexes upon completion of the merger.";
                         storyResultsBox.Text = corporateActionStory;
                     }
-                    else if (parentSizeDimension == sizeDimension.Global)
+                    else if (parent.SizeDimension == sizeDimension.Global)
                     {
                         //Write acquired by  Global story
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                             $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                            $"; {MembershipFinder(childSizeDimension)}" +
-                            $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                            $"; {MembershipFinder(child.SizeDimension)}" +
+                            $"{MembershipFinder(child)}): " +
                             $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Non-US Russell Index Member) will acquire " +
                             $"{childCompanyName.Text} for cash. In the transaction, each share of {childCompanyName.Text} " +
                             $"will be exchanged for {cashTermsAmount.Text} in cash. The merger is pending {childCompanyName.Text}'s " +
@@ -200,7 +162,7 @@ namespace CorporateActionCalendarStory
                     {
                         //Write US-us story
                         string styleChange = "";
-                        if (newValue == 100 * Math.Round(parentValueNum, 3))
+                        if (newValue == 100 * Math.Round(parent.ValueNum, 3))
                         {
                             styleChange = "remain constant at";
                         }
@@ -209,7 +171,7 @@ namespace CorporateActionCalendarStory
                             styleChange = "change to";
                         }
                         string stabChange = "";
-                        if (newDynamic == 100 * Math.Round(parentDynamicNum, 3))
+                        if (newDynamic == 100 * Math.Round(parent.DynamicNum, 3))
                         {
                             stabChange = "remain constant at";
                         }
@@ -219,10 +181,10 @@ namespace CorporateActionCalendarStory
                         }
                         string corporateActionStory = $"Projected to close {closeDate.Text}:" +
                         $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                        $"; {MembershipFinder(childSizeDimension)}" +
-                        $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                        $"; {MembershipFinder(child.SizeDimension)}" +
+                        $"{MembershipFinder(child)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; " +
-                        $"{MembershipFinder(parentSizeDimension)}{MembershipFinder(parentRSCC, parentisGrowth, parentisValue, parentisDefensive, parentisDynamic)}" +
+                        $"{MembershipFinder(parent.SizeDimension)}{MembershipFinder(parent)}" +
                         $") will acquire {childCompanyName.Text} for stock. In the transaction, each share of {childCompanyName.Text} " +
                         $"will be exchanged for {stockTermsAmount.Text} of a share of {parentCompanyName.Text}. The merger is pending {childCompanyName.Text}'s " +
                         $"shareholder meeting on {meetingDate.Text}. {childCompanyName.Text} will be removed from the " +
@@ -265,14 +227,14 @@ namespace CorporateActionCalendarStory
             else if (tenderOfferButton.IsChecked == true)
             {
                 //write a tender offer story
-                if (parentSizeDimension == sizeDimension.Other)
+                if (parent.SizeDimension == sizeDimension.Other)
                 {
                     
                     //write story for acquired by non-member
 
                     string corporateActionStory = $"{childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                        $"; {MembershipFinder(childSizeDimension)}" +
-                        $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                        $"; {MembershipFinder(child.SizeDimension)}" +
+                        $"{MembershipFinder(child)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Not in the Russell indexes) will acquire " +
                         $"{childCompanyName.Text} through a cash tender offer. In the transaction, each share of {childCompanyName.Text} " +
                         $"will be exchanged for {cashTermsAmount.Text} in cash. The offer is set to expire on " +
@@ -280,12 +242,12 @@ namespace CorporateActionCalendarStory
                         $"Russell Indexes upon completion of the merger.";
                     storyResultsBox.Text = corporateActionStory;
                 }
-                else if (parentSizeDimension == sizeDimension.Global)
+                else if (parent.SizeDimension == sizeDimension.Global)
                 {
                     //Write acquired by  Global story
                     string corporateActionStory = $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                        $"; {MembershipFinder(childSizeDimension)}" +
-                        $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                        $"; {MembershipFinder(child.SizeDimension)}" +
+                        $"{MembershipFinder(child)}): " +
                         $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; Non-US Russell Index Member) will acquire " +
                         $"{childCompanyName.Text} through a cash tender offer. In the transaction, each share of {childCompanyName.Text} " +
                         $"will be exchanged for {cashTermsAmount.Text} in cash. The offer is set to expire on " +
@@ -297,8 +259,8 @@ namespace CorporateActionCalendarStory
                 {
                     //Write US-us story
                     string corporateActionStory = $" {childCompanyName.Text}, {childNameSuffix.Text} ({childTicker.Text}" +
-                    $"; {MembershipFinder(childSizeDimension)}" +
-                    $"{MembershipFinder(childRSCC, childisGrowth, childisValue, childisDefensive, childisDynamic)}): " +
+                    $"; {MembershipFinder(child.SizeDimension)}" +
+                    $"{MembershipFinder(child)}): " +
                     $"{parentCompanyName.Text}, {parentNameSuffix.Text} ({parentTicker.Text}; " +
                     $"Russell Index Member) will acquire " +
                     $"{childCompanyName.Text} through a cash tender offer. In the transaction, each share of {childCompanyName.Text} " +
@@ -317,8 +279,8 @@ namespace CorporateActionCalendarStory
 
 
             //string corporateActionStory = String.Format("{0} {1}", parentCompanyName.Text, parentNameSuffix.Text);
-            //corporateActionStory += String.Format(" {0}", MembershipFinder(parentSizeDimension));
-            //corporateActionStory += String.Format(": {0} {1} {2}", childCompanyName.Text, childNameSuffix.Text, MembershipFinder(childSizeDimension));
+            //corporateActionStory += String.Format(" {0}", MembershipFinder(parent.SizeDimension));
+            //corporateActionStory += String.Format(": {0} {1} {2}", childCompanyName.Text, childNameSuffix.Text, MembershipFinder(child.SizeDimension));
             //corporateActionStory +=
             //    String.Format(" will acquire {0} for cash. In the transaction, each share of {0} stock will be exchanged for {1} in cash. The merger is pending {0}’s shareholder meeting on REPLACE MEETING DATE. {0} will be removed from the Russell Indexes upon completion of the merger."
             //    , childCompanyName.Text, cashTermsAmount.Text);
@@ -388,22 +350,22 @@ namespace CorporateActionCalendarStory
                     return "";
             }
         }
-        public string MembershipFinder(bool SP, bool isGrowth, bool isValue, bool isDefensive, bool isDynamic)
+        public string MembershipFinder(StockInputs inputs)
         {
             string returnValue = "";
-            if (SP)
+            if (inputs.RSCC)
             {
                 returnValue += ", RS";
-                if (isGrowth)
+                if (inputs.IsGrowth)
                 {
                     returnValue += ", G";
-                    if (isValue)
+                    if (inputs.IsValue)
                     {
                         returnValue += ", V";
-                        if (isDefensive)
+                        if (inputs.IsDefensive)
                         {
                             returnValue += ", DF";
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -415,7 +377,7 @@ namespace CorporateActionCalendarStory
                         }
                         else
                         {
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -428,10 +390,10 @@ namespace CorporateActionCalendarStory
                     }
                     else
                     {
-                        if (isDefensive)
+                        if (inputs.IsDefensive)
                         {
                             returnValue += ", DF";
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -443,7 +405,7 @@ namespace CorporateActionCalendarStory
                         }
                         else
                         {
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -457,13 +419,13 @@ namespace CorporateActionCalendarStory
                 }
                 else
                 {
-                    if (isValue)
+                    if (inputs.IsValue)
                     {
                         returnValue += ", V";
-                        if (isDefensive)
+                        if (inputs.IsDefensive)
                         {
                             returnValue += ", DF";
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -475,7 +437,7 @@ namespace CorporateActionCalendarStory
                         }
                         else
                         {
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -488,10 +450,10 @@ namespace CorporateActionCalendarStory
                     }
                     else
                     {
-                        if (isDefensive)
+                        if (inputs.IsDefensive)
                         {
                             returnValue += ", DF";
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -503,7 +465,7 @@ namespace CorporateActionCalendarStory
                         }
                         else
                         {
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -518,16 +480,16 @@ namespace CorporateActionCalendarStory
             }
             else
             {
-                if (isGrowth)
+                if (inputs.IsGrowth)
                 {
                     returnValue += ", G";
-                    if (isValue)
+                    if (inputs.IsValue)
                     {
                         returnValue += ", V";
-                        if (isDefensive)
+                        if (inputs.IsDefensive)
                         {
                             returnValue += ", DF";
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -539,7 +501,7 @@ namespace CorporateActionCalendarStory
                         }
                         else
                         {
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -552,10 +514,10 @@ namespace CorporateActionCalendarStory
                     }
                     else
                     {
-                        if (isDefensive)
+                        if (inputs.IsDefensive)
                         {
                             returnValue += ", DF";
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -567,7 +529,7 @@ namespace CorporateActionCalendarStory
                         }
                         else
                         {
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -581,13 +543,13 @@ namespace CorporateActionCalendarStory
                 }
                 else
                 {
-                    if (isValue)
+                    if (inputs.IsValue)
                     {
                         returnValue += ", V";
-                        if (isDefensive)
+                        if (inputs.IsDefensive)
                         {
                             returnValue += ", DF";
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -599,7 +561,7 @@ namespace CorporateActionCalendarStory
                         }
                         else
                         {
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -612,10 +574,10 @@ namespace CorporateActionCalendarStory
                     }
                     else
                     {
-                        if (isDefensive)
+                        if (inputs.IsDefensive)
                         {
                             returnValue += ", DF";
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -627,7 +589,7 @@ namespace CorporateActionCalendarStory
                         }
                         else
                         {
-                            if (isDynamic)
+                            if (inputs.IsDynamic)
                             {
                                 returnValue += ", DY";
                                 return returnValue;
@@ -685,7 +647,7 @@ namespace CorporateActionCalendarStory
             }
             catch (Exception)
             {
-                MessageBox.Show("You messed up parent growth");
+                MessageBox.Show("Style/Stabilty Ratios, float and proration must be between 0 and 1");
                 return 0.000;
             }
         }
@@ -725,16 +687,50 @@ namespace CorporateActionCalendarStory
                 input.GrowthNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).parentGrowth.Text);
                 input.ValueNum = 1 - input.GrowthNum;
                 input.DynamicNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).parentDynamic.Text);
-                input.DefensiveNum = input.DynamicNum;
+                input.DefensiveNum = 1 - input.DynamicNum;
                 input.FloatNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).parentFloat.Text);
+                input.IsGrowth = !input.GrowthNum.Equals(0.00);
+                input.IsValue = !input.ValueNum.Equals(0.00);
+                input.IsDefensive = !input.DefensiveNum.Equals(0.00);
+                input.IsDynamic = !input.DynamicNum.Equals(0.00);
+                try
+                {
+                    input.StockTerms = Convert.ToDouble(((MainWindow)Application.Current.MainWindow).stockTermsAmount.Text);
+                }
+                catch (Exception)
+                {
+                    input.StockTerms = 0.000;
+                }
+                input.StockProrationNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).stockProration.Text);
+                input.CashProrationNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).cashProration.Text);
+                try
+                {
+                    input.SizeDimension = (sizeDimension)Enum.Parse(typeof(sizeDimension), ((MainWindow)Application.Current.MainWindow).parentSize.Text);
+                }
+                catch (Exception)
+                {
+                    input.SizeDimension = sizeDimension.Other;
+                }
             }
             else
             {
                 input.GrowthNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).childGrowth.Text);
                 input.ValueNum = 1 - input.GrowthNum;
                 input.DynamicNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).childDynamic.Text);
-                input.DefensiveNum = input.DynamicNum;
+                input.DefensiveNum = 1 - input.DynamicNum;
                 input.FloatNum = ConvertToDouble(((MainWindow)Application.Current.MainWindow).childFloat.Text);
+                input.IsGrowth = !input.GrowthNum.Equals(0.00);
+                input.IsValue = !input.ValueNum.Equals(0.00);
+                input.IsDefensive = !input.DefensiveNum.Equals(0.00);
+                input.IsDynamic = !input.DynamicNum.Equals(0.00);
+                try
+                {
+                    input.SizeDimension = (sizeDimension)Enum.Parse(typeof(sizeDimension), ((MainWindow)Application.Current.MainWindow).childSize.Text);
+                }
+                catch (Exception)
+                {
+                    input.SizeDimension = sizeDimension.Other;
+                }
             }
             
             return input;

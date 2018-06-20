@@ -45,6 +45,14 @@ namespace CorporateActionCalendarStory
         public double FloatNum { get; set; }//= ConvertToDouble(parentFloat.Text);
         public bool RSCC { get; set; }//= CheckSP(parentSP5.IsChecked);
         public long ShareNum { get; set; }//= ConvertToLong(parentTSO.Text);
+        public double StockTerms { get; set; }
+        public double CashProrationNum { get; set; }
+        public double StockProrationNum { get; set; }
+        public bool IsGrowth { get; set; }
+        public bool IsValue { get; set; }
+        public bool IsDefensive { get; set; }
+        public bool IsDynamic { get; set; }
+        public MainWindow.sizeDimension SizeDimension { get; set; }
         public StockInputs()
         {
 
