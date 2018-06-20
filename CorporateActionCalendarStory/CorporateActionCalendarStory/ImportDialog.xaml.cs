@@ -63,11 +63,11 @@ namespace CorporateActionCalendarStory
                     {
                         MessageBox.Show("The provided child ticker was not found in the file.", "Error: Ticker not found");
                     }
-                    MainWindow.PopulateTable(s1, s2);
+                    PopulateTable(s1, s2);
                 }
                 else
                 {
-                    MainWindow.PopulateTable(s1);
+                    PopulateTable(s1);
                 }
             }
         }
@@ -84,6 +84,45 @@ namespace CorporateActionCalendarStory
             return String.Empty;
 
         }
-        
+        public static void PopulateTable(string fileLine)
+        {
+            string[] data = fileLine.Split('|');
+            ((MainWindow)Application.Current.MainWindow).parentCompanyName.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).parentTicker.Text = data[2];
+            ((MainWindow)Application.Current.MainWindow).parentTSO.Text = data[9];
+            ((MainWindow)Application.Current.MainWindow).parentFloat.Text = $"{(1 - MainWindow.ConvertToDouble(data[11]))}";
+            ((MainWindow)Application.Current.MainWindow).parentSize.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).parentGrowth.Text = data[15];
+            ((MainWindow)Application.Current.MainWindow).parentDynamic.Text = "";
+            if (data[22] == "Y")
+            {
+                ((MainWindow)Application.Current.MainWindow).parentSP5.IsChecked = true;
+            }
+            else
+            {
+                ((MainWindow)Application.Current.MainWindow).parentSP5.IsChecked = false;
+            }
+        }
+        public static void PopulateTable(string parentFileLine, string childFileLine)
+        {
+            string[] data = childFileLine.Split('|');
+            var table = new TablePopulation();
+            PopulateTable(parentFileLine);
+            ((MainWindow)Application.Current.MainWindow).childCompanyName.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).childTicker.Text = data[2];
+            ((MainWindow)Application.Current.MainWindow).childTSO.Text = data[9];
+            ((MainWindow)Application.Current.MainWindow).childFloat.Text = data[12];
+            ((MainWindow)Application.Current.MainWindow).childSize.Text = data[4];
+            ((MainWindow)Application.Current.MainWindow).childGrowth.Text = data[15];
+            ((MainWindow)Application.Current.MainWindow).childDynamic.Text = data[4];
+            if (data[22] == "Y")
+            {
+                ((MainWindow)Application.Current.MainWindow).childSP5.IsChecked = true;
+            }
+            else
+            {
+                ((MainWindow)Application.Current.MainWindow).childSP5.IsChecked = false;
+            }
+        }
     }
 }
