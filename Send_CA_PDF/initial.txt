@@ -1,0 +1,210 @@
+Option Explicit
+Sub initialMailing()
+Dim OutlookApp As Outlook.Application
+Dim OutlookMail As Outlook.MailItem
+Dim EmailList As String
+Dim ie As Object
+Dim printDate As String
+Dim tDate
+Dim strFileName1, strFileName, USCA, USSGVCA, pdfShift As String
+Dim strFileExists As String
+
+'check shift number input
+If Sheet1.Range("c8").Value = "" Then
+
+MsgBox ("Please Enter the number for this shift of report")
+
+Exit Sub
+
+ElseIf Sheet1.Range("c8").Value = "1" Then
+
+pdfShift = "A"
+
+ElseIf Sheet1.Range("c8").Value = "2" Then
+
+pdfShift = "B"
+
+ElseIf Sheet1.Range("c8").Value = "3" Then
+
+pdfShift = "C"
+
+End If 'end check shift number
+
+
+Set ie = CreateObject("InternetExplorer.Application")
+
+
+
+tDate = Format(Date, "mm/dd/YYYY")
+'set attachments from the folders and files
+
+printDate = CStr(tDate)
+
+
+
+
+
+
+'check distribution report email list
+tDate = Format(Date, "yyyymmdd")
+strFileName = "U:\Corp_Action_email_Distrib_List\report" & tDate & ".xls"
+strFileName1 = "U:\Corp_Action_email_Distrib_List\report" & tDate & ".xlsx"
+Dim listType As Integer
+listType = 0
+
+strFileExists = Dir(strFileName) 'set list name in xls
+
+If strFileExists = "" Then 'check today's list in .xls form exist or not
+    
+    strFileExists = Dir(strFileName1) 'set list name in xlsx
+    
+    If strFileExists = "" Then 'check today's list in .xlsx form exist or not
+        
+        listType = 3
+        MsgBox ("The CA email distribution list for today is not found. Please check the list.")
+        Exit Sub
+    
+    Else
+        listType = 1
+    End If
+    
+End If 'end checking existing of today's list
+
+EmailList = EList(tDate, listType)
+
+'check USCorpAction PDF existing
+USCA = "U:\Index\index production\Client Notification Reports\" & Year(Date) & "\USCorpActions" & tDate & pdfShift & ".pdf"
+strFileExists = Dir(USCA)
+If strFileExists = "" Then
+    MsgBox ("The PDF of USCorpAction for this Shift is not found. Please check it.")
+    
+    Exit Sub
+    
+End If
+'check USstability PDF existing
+USSGVCA = "U:\Index\index production\Client Notification Reports\" & Year(Date) & "\USStabilityGVCorpActions" & tDate & pdfShift & ".pdf"
+strFileExists = Dir(USSGVCA)
+If strFileExists = "" Then
+    MsgBox ("The PDF of USStabilityGVCorpActions for this Shift is not found. Please check it.")
+    
+    Exit Sub
+    
+End If
+
+'set and connect the mailbox object
+Set OutlookApp = New Outlook.Application
+Set OutlookMail = OutlookApp.CreateItem(olMailItem)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'get template from existed HTML
+'ie.Visible = True
+ie.navigate ("U:\Index\index production\Macros\Send_CA_PDF\Russell US Corporate Actions Evening Report.htm")
+
+Do
+DoEvents
+Loop Until ie.readyState = 4
+
+Dim mailBody, timeSpan, imgHTML
+Dim i As Integer
+
+
+
+'Clean the format of mail body
+Set mailBody = ie.Document.getElementsByTagName("div")(0)
+Set mailBody = mailBody.getElementsByTagName("p")
+
+For i = 0 To 5
+mailBody(i).innerText = ""
+
+Next
+
+
+'input today's Date
+Set timeSpan = ie.Document.getElementsByTagName("table")(0)
+Set timeSpan = timeSpan.getElementsByTagName("tr")(2)
+Set timeSpan = timeSpan.getElementsByTagName("span")(0)
+ timeSpan.innerText = printDate
+'End of get HTML Template
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+'insert FTSE LOGO picture
+Set imgHTML = ie.Document.getElementByID("Picture_x0020_2")
+imgHTML.innerHTML = "<?xml:namespace prefix = 'v' ns = 'urn:schemas-microsoft-com:vml' /><v:imagedata src = 'U:\Index\index production\Macros\Send_CA_PDF\Russell US Corporate Actions Evening Report_files\image001.png' o:href = 'cid:image002.png@01D11083.7B7FFA80'></v:imagedata>"
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'get the innerHTML of template
+Set mailBody = ie.Document.getElementsByTagName("html")(0)
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'get Email list
+
+
+With OutlookMail
+
+    .SentOnBehalfOfName = "Info@ftserussell.com"
+    .BodyFormat = olFormatHTML
+    .Display
+    .HTMLBody = mailBody.innerHTML
+    .To = "Info@ftserussell.com"
+    .CC = ""
+    .BCC = "Index Management Americas; Operations - Policy; North American Client Service; " & EmailList
+    .Subject = "Russell US Corporate Actions: " & shift() & " Report"
+    .Attachments.Add USCA
+    .Attachments.Add USSGVCA
+    .Recipients.ResolveAll
+
+    
+End With
+
+
+End Sub
+
+
+Function EList(tDate As Variant, listType As Integer) As String
+'get mail list
+
+Dim wb As Workbook
+Dim endRow, counter As Integer
+
+tDate = Format(Date, "YYYYMMDD")
+
+
+If listType = 0 Then 'set wb name base on the file type
+    Set wb = Workbooks.Open(Filename:= _
+                 "U:\Corp_Action_email_Distrib_List\report" & tDate & ".xls", UpdateLinks:=0)
+ElseIf listType = 1 Then
+        Set wb = Workbooks.Open(Filename:= _
+                 "U:\Corp_Action_email_Distrib_List\report" & tDate & ".xlsx", UpdateLinks:=0)
+End If 'end set listType
+             
+endRow = Range("B9999").End(xlUp).Row
+counter = 2
+EList = ""
+Do Until counter > endRow
+
+If Cells(counter, 4).Value <> "" And InStr(Cells(counter, 4).Value, "@") <> 0 Then
+EList = EList + Cells(counter, 4).Value + "; "
+End If
+
+counter = counter + 1
+Loop
+
+
+
+wb.Close
+MsgBox ("This report has about " & endRow & " receipients.")
+End Function
+
+Function shift() As String
+'input the shift
+Dim shiftNum As Integer
+shiftNum = Sheet1.Range("c8").Value
+Select Case shiftNum
+Case 1
+shift = "Morning"
+Case 2
+shift = "Midday"
+Case 3
+shift = "Evening"
+End Select
+
+End Function
