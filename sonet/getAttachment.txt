@@ -1,0 +1,195 @@
+Option Explicit
+Public i As Integer
+Sub runGetAttachemtn()
+'the application will start to run every 30 sec
+Application.OnTime Now() + TimeValue("00:00:50"), "GetAttachments"
+
+
+End Sub
+
+'''''''''''''''''''''''''''
+'' https://forums.slipstick.com/threads/95555-vba-to-switch-outlook-online-offline/
+'''''''''''''''''''''''''''
+Sub GetAttachments()
+
+'On Error GoTo GetAttachments_err
+
+Dim ns As Namespace
+Dim Inbox As MAPIFolder
+Dim Item As Object
+Dim Atmt As Attachment
+Dim SenderName As String
+Dim fileName As String
+Dim checker As Boolean 'checker of saved file
+Dim receiveDate
+Dim checkResult As Boolean
+Dim Items
+Dim ccList
+
+
+checkResult = False
+checker = False
+
+Call OutlookSession
+
+'set and connect the mailbox object
+Set ns = GetNamespace("MAPI")
+Set Inbox = ns.GetDefaultFolder(olFolderInbox)
+Set Items = Inbox.Items
+Items.Sort "[ReceivedTime]", True
+'msg for no email is found
+ If Inbox.Items.Count = 0 Then
+    MsgBox "There are no messages in the Inbox.", vbInformation, _
+           "Nothing Found"
+    Exit Sub
+ End If
+ 
+ 
+' if sonet email/email exists, download an email
+  For Each Item In Items
+    receiveDate = Item.ReceivedTime
+    receiveDate = CDate(receiveDate)
+  
+
+    'check the sender name for the sender of sonet
+    If Item.SenderName = "EUI-CMOPS@euroclear.com" And receiveDate > Date - 1 Then
+
+    receiveDate = Format(receiveDate, "YYYYMMDD")
+
+    
+    'loop all attachments for sonet email
+        For Each Atmt In Item.Attachments
+    
+            fileName = ThisWorkbook.Path & "\DBVRATES" & receiveDate & ".csv"
+            Atmt.SaveAsFile fileName
+            
+            checker = True
+            
+            
+    
+        Exit For 'Found attachment -- exit looping attachment
+    
+    Next Atmt 'end loop attachment of sonet
+    
+    Exit For 'Found attachment -- exit looping emails/items
+  
+     ElseIf Item.SenderName = "EUI-CMOPS@euroclear.com" And receiveDate < Date Then
+        MsgBox "No Sonet for today."
+        Exit For
+    End If 'end check sonet sendername
+     
+    Next Item  'end looping email/item
+
+If checker = False Then 'check if file is downloade
+
+Call runGetAttachemtn 'if not, re-run the runGetAttachment macro
+
+Else 'else, end the macro.
+    MsgBox "The Sonet file is downloaded" 'get a download successfully notice to the user
+    
+    Call sendResult 'send out saved successfully notice from email
+
+    
+End If ' end checking download result
+
+
+End Sub
+
+Sub sendResult()
+' send out result to the IM Americas by Email
+Dim OutlookApp As Outlook.Application
+Dim OutlookMail As Outlook.MailItem
+
+'set and connect the mailbox object
+Set OutlookApp = New Outlook.Application
+Set OutlookMail = OutlookApp.CreateItem(olMailItem)
+
+'Use With the store information of sender, receive, content, and other bodyHTML format.
+With OutlookMail
+    .BodyFormat = olFormatHTML
+    .Display
+    .HTMLBody = "Hello," & "<br>" & "<br>" & "The SONET File is now saved." & "<br>" & "<br>" & "Regards," & "<br>" & "<br>" & .HTMLBody
+    
+    .To = "Index Management Americas"
+    .CC = "Stover, Ted; Tang, Ling; Yan, Yan; Ng, Richard"
+    .BCC = ""
+    .Subject = "Sterling Risk Free Reference (SONET)"
+    .Send
+    
+End With
+
+
+
+End Sub
+
+
+
+
+
+
+
+'this is a sub for validing the sonet file
+Sub validateSonet()
+
+Dim savedDate
+Dim fileName As String
+Dim Sonet As Workbook
+Dim i As Integer
+
+savedDate = Format(Date, "YYYYMMDD")
+fileName = ThisWorkbook.Path & "\DBVRATES" & savedDate & ".csv"
+   'clear warnings to let macro go smooth
+   Application.ScreenUpdating = False
+   Application.DisplayAlerts = False
+
+'Open the downloaded sonet for today
+Set Sonet = Workbooks.Open(fileName:= _
+            fileName, UpdateLinks:=0)
+   
+   Sonet.Activate
+   
+   i = Range("A9999").End(xlUp).Row
+   If i = Cells(i, 2).Value Then  'check if the product count matches the total row number
+    
+    MsgBox "Rows of data are validated"
+    
+    End If 'end checking product counts and total rows
+    
+    
+    Sonet.Close
+   Application.ScreenUpdating = True
+   Application.DisplayAlerts = True
+End Sub
+
+
+Sub OutlookSession()
+'check outlook session, toggle it to online if the session is  offline
+
+Dim oNS As Namespace
+Set oNS = Outlook.Application.Session
+
+'check off session and turn it on
+ If oNS.ExchangeConnectionMode = olCachedOffline Or _
+ oNS.ExchangeConnectionMode = olOffline Then
+
+ Dim olApp As Outlook.Application
+ Dim objExpl As Outlook.Explorer
+ 
+ Set olApp = Outlook.Application
+ Set objExpl = olApp.ActiveExplorer
+
+
+ objExpl.CommandBars.ExecuteMso ("ToggleOnline")
+
+
+ End If
+
+
+
+End Sub
+
+ 
+
+
+
+
