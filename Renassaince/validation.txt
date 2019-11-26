@@ -1,0 +1,217 @@
+Option Explicit
+Sub readFiles()
+Dim i As Integer ' counter of the product list name
+Dim rowCounter As Integer 'counter for layout the filter result
+Dim myFile, myFiles As Object
+Dim myFSO As Object
+Dim myFolder As Object
+Dim tDate
+Dim ws As Worksheet
+Dim pName As String
+Dim wsCount As Integer
+Dim pDate As String 'produce date
+Dim BsheetName As String
+''''''''''''''''''''''
+Application.DisplayAlerts = False
+
+Cells(12, 3).Value = ""
+Cells(13, 3).Value = ""
+
+'check exsiting of "Breach Securities" worksheet
+wsCount = Worksheets.Count
+pDate = CStr(Format(Date, "yyyymmdd"))
+BsheetName = "Breached Securities" & pDate
+   Do While wsCount > 0
+    
+     If Worksheets(wsCount).Name <> "Console" Then
+    
+        Worksheets(wsCount).Delete
+        
+      End If
+      wsCount = wsCount - 1
+    
+    Loop
+    
+    
+'''''''''''''''''''''''''''''''''''''
+    Set ws = ThisWorkbook.Sheets.Add(After:= _
+             ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count))
+ws.Name = BsheetName
+ws.Cells(1, 1).Value = "File Name"
+ws.Cells(1, 2).Value = "SEDOL"
+ws.Cells(1, 3).Value = "% Wt in FTSE Renaissance"
+ws.Cells(1, 4).Value = "CA"
+
+
+tDate = Format(Date, "YYYYMMDD")
+
+Set myFSO = CreateObject("Scripting.FileSystemObject")
+Set myFolder = myFSO.getfolder("U:\Index\index production\Macros\RenaissanceCap\" & tDate)
+Set myFiles = myFolder.Files
+Dim strFolderExist As String
+strFolderExist = Dir(myFolder, vbDirectory)
+
+If strFolderExist = "" Or myFiles.Count = 0 Then 'check existing of files
+    MsgBox "Your files cannot be found." & vbNewLine & "Please Make sure today's files are produced and saved."
+    Exit Sub
+    
+End If
+
+
+'check current file name to see which product it belongs to
+'loop throught the all product name from product list
+For i = 1 To 4
+rowCounter = Workbooks("RenaissanCapCheck").Sheets(BsheetName).Range("A9999").End(xlUp).Row
+
+For Each myFile In myFiles
+If InStr(myFile.Name, Workbooks("RenaissanCapCheck").Sheets("Console").Cells(6 + i, 2).Value) <> 0 Then 'find the files which match the product name
+rowCounter = rowCounter + 1
+
+
+pName = Workbooks("RenaissanCapCheck").Sheets("Console").Cells(6 + i, 2).Value
+Select Case pName
+
+Case "ipio", "ipro"
+    Call checkWT1(rowCounter, myFile, i, BsheetName)        'check existed WT data
+Case "ipto", "ipho"
+    Call check_calWT(rowCounter, myFile, i, BsheetName)     'No WT data in the file. need to cal WT first, then check
+End Select
+
+End If 'end with check product list name  vs files name
+Next 'end looping files from folder
+Next 'end get the product name from the list
+ws.Range("A:G").EntireColumn.AutoFit
+End Sub
+
+
+Sub check_calWT(rowCounter As Integer, myFile, i As Integer, BsheetName As String)
+Dim wb As Workbook
+'open workbook if the fileName match the name in the looping prodcut list
+Set wb = Workbooks.Open(myFile.Path)
+Dim sheetName As String
+Dim endRow As Long 'last row of the list
+Dim stockCounter As Integer 'row counter for stocks in each product file
+Dim mktCap As Double 'total market cap of this index on today
+
+Dim breachNum As Integer 'the number of the breached securities in a file
+
+
+stockCounter = 5 'the row start to be counted at Row 5th
+breachNum = 0
+
+'looping the stock list, calculate wt in ftse and check breaching status
+sheetName = myFile.Name
+sheetName = Left(sheetName, 8)
+
+'Calculate total market cap of today
+
+endRow = wb.Sheets(sheetName).Range("R9999").End(xlUp).Row 'get the last row from the product file
+
+
+mktCap = Application.Sum(Range(wb.Sheets(sheetName).Cells(5, 18), wb.Sheets(sheetName).Cells(endRow, 18)))
+Call checkWT2(endRow, mktCap, stockCounter, sheetName, breachNum, wb, i, BsheetName)
+' end of getting total market cap
+wb.Save
+wb.Close
+End Sub
+
+
+
+
+
+'cal and check the WT for ipho and ipto
+Sub checkWT2(endRow As Long, mktCap As Double, stockCounter As Integer, sheetName As String, breachNum As Integer, wb As Workbook, i As Integer, BsheetName As String)
+'''''''''''''''''''''''''''''''''''''''
+'reset endRow = the last row in Breach Securities sheet
+Dim wt
+Dim inCap As Double
+
+endRow = Workbooks("RenaissanCapCheck").Sheets(BsheetName).Range("A9999").End(xlUp).Row + 1
+Do While wb.Sheets(sheetName).Cells(stockCounter, 2).Value <> ""   'loop the list by Con code till it's empty
+
+        'get %wt of this security in Ftse
+            inCap = wb.Sheets(sheetName).Cells(stockCounter, 18).Value
+           wt = wb.Sheets(sheetName).Cells(stockCounter, 18).Value / mktCap
+           wt = Round(wt, 2)
+           wb.Sheets(sheetName).Cells(stockCounter, 19).Value = wt
+           wb.Sheets(sheetName).Cells(stockCounter, 19).NumberFormat = "0.00%"
+            If wt > Workbooks("RenaissanCapCheck").Sheets("Console").Cells(6 + i, 3).Value Then  'check %wt
+            breachNum = breachNum + 1 'record the number of breached securites
+            'get file name of this security
+            Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 1).Value = sheetName
+            'get sedol of the security
+            Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 2).Value = wb.Sheets(sheetName).Cells(stockCounter, 2).Value
+            Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 3).Value = (wt * 100) & "%*"
+
+
+
+            endRow = endRow + 1
+            
+            
+            End If 'end check %wt
+            stockCounter = stockCounter + 1
+            
+Loop
+
+
+
+If breachNum = 0 Then 'get notice for nothing breach in the file
+endRow = Workbooks("RenaissanCapCheck").Sheets(BsheetName).Range("A9999").End(xlUp).Row + 1  'get the row after the last row in the breach files sheet
+Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 1).Value = sheetName
+Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 2).Value = "Nothing Breach in " & sheetName
+
+
+End If
+End Sub
+
+
+Sub checkWT1(rowCounter As Integer, myFile, i As Integer, BsheetName As String) 'check the WT for ipio and ipro
+
+Dim wb As Workbook
+'open workbook if the fileName match the name in the looping prodcut list
+Set wb = Workbooks.Open(myFile.Path)
+Dim sheetName As String
+Dim endRow As Long 'last row of the list
+Dim stockCounter As Integer 'row counter for stocks in each product file
+Dim wt
+
+Dim breachNum As Integer 'the number of the breached securities in a file
+
+
+stockCounter = 5 'the row start to be counted at Row 5th
+breachNum = 0
+
+'looping the stock list, calculate wt in ftse and check breaching status
+sheetName = myFile.Name
+sheetName = Left(sheetName, 8)
+
+endRow = Workbooks("RenaissanCapCheck").Sheets(BsheetName).Range("A9999").End(xlUp).Row + 1   ' get the end row of the list and prepare to enter new row below
+'start loop all the securities in the file
+Do Until wb.Sheets(sheetName).Cells(stockCounter, 2) = ""
+
+    wt = wb.Sheets(sheetName).Cells(stockCounter, 19).Value 'get WT from column S in the sheet
+            
+            If wt > Workbooks("RenaissanCapCheck").Sheets("Console").Cells(6 + i, 3).Value Then  'check %wt
+                breachNum = breachNum + 1 'record the number of breached securites
+                'get file name of this security
+                Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 1).Value = sheetName
+                'get sedol of the security
+                Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 2).Value = wb.Sheets(sheetName).Cells(stockCounter, 2).Value
+                Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 3).Value = (wt * 100) & "%*"
+
+            endRow = endRow + 1
+            
+            
+            End If 'end check %wt
+    stockCounter = stockCounter + 1
+
+Loop
+
+If breachNum = 0 Then 'get notice for nothing breach in the file
+endRow = Workbooks("RenaissanCapCheck").Sheets(BsheetName).Range("A9999").End(xlUp).Row + 1  'get the row after the last row in the breach files sheet
+Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 1).Value = sheetName
+Workbooks("RenaissanCapCheck").Sheets(BsheetName).Cells(endRow, 2).Value = "Nothing Breach in " & sheetName
+End If
+
+wb.Close
+End Sub

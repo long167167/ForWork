@@ -1,0 +1,91 @@
+Option Explicit
+Public breachchk As Boolean
+
+Sub sendinNotice()
+Dim OutlookApp As Outlook.Application
+Dim OutlookMail As Outlook.MailItem
+Dim issueNotice As String
+Dim tDate
+
+tDate = Format(Date, "yyyymmdd")
+'set attachments from the folders and files
+Dim myFile, myFiles As Object
+Dim myFSO As Object
+Dim myFolder As Object
+Set myFSO = CreateObject("Scripting.FileSystemObject")
+Set myFolder = myFSO.getfolder("U:\Index\index production\Macros\RenaissanceCap\" & tDate)
+Set myFiles = myFolder.Files
+
+
+
+
+'set and connect the mailbox object
+Set OutlookApp = New Outlook.Application
+Set OutlookMail = OutlookApp.CreateItem(olMailItem)
+
+
+
+
+If breachchk = True Then
+'notice for breaching exists
+
+    Cells(24, 3).Value = "...........Please Write down the issue of breaching here............."
+    
+    issueNotice = "Hello Renaissance Team," _
+    & "<br>" & "<br>" _
+    & Cells(24, 3).Value & "<br>" & "<br>" _
+    & Cells(26, 3).Value & "<br>" & "<br>" _
+    & Cells(28, 3).Value & "<br>" & "<br>" _
+    & Cells(30, 3).Value & "<br>" & "<br>" _
+    & "Respectfully,"
+
+
+ElseIf breachchk = False Then
+
+'Notice for no breach
+    issueNotice = "Hello Renaissance Team," & "<br>" & "<br>" _
+    & "Please note that all capped weights are good and no corporate actions have pushed constituents past the capping buffer." _
+    & "<br>" & "<br>" & "Also, there is no IPO that is pricing within a 10 day trading period which will require bundling." _
+    & "<br>" & "<br>" & "Respectfully,"
+
+ElseIf breachchk = "" Then
+'if breaching button are not clicked
+MsgBox "Please Select the status of Cap Breaching Check"
+Exit Sub
+End If
+
+
+
+
+With OutlookMail
+    .BodyFormat = olFormatHTML
+    .Display
+    .HTMLBody = issueNotice & .HTMLBody
+    .To = "ipoindex@renaissancecapital.com"
+    .CC = "Index Management Americas"
+    .BCC = ""
+    .Subject = "Renaissance 5% & 10% Capping and Bundling Check"
+    
+    For Each myFile In myFiles
+    
+    .Attachments.Add myFile.Path
+    
+    
+    Next
+    
+
+    
+End With
+
+
+
+Cells(24, 3).Value = ""
+Range("C2").Value = ""
+Range("C3").Value = ""
+Range("G6").Value = ""
+Range("G7").Value = ""
+Sheet1.CheckBox1.Value = False
+
+
+End Sub
+

@@ -1,0 +1,367 @@
+Option Explicit
+Sub getFile()
+' access webmenu --> submit prodcution form to produce items --> go to index / world --> download files
+'Dim iobject As HTMLTextArea
+Dim ie As Object
+Dim webmenu As String
+Dim inputTag, Tags
+Dim listNum As Integer
+Dim ProdDateChk As Boolean
+Dim tDay
+Dim pDate, pDate1, pMonth, pMonth1, pYear, pYear1
+ProdDateChk = False
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'pre-production
+'check holiday
+                If Sheet1.CheckBox1.Value = True Then
+                    MsgBox "Due to Holiday, Please enter the specific dates for production"
+                     'check unfilled produce date
+                        ProdDateChk = checkProduceDate()
+                    If ProdDateChk = True Then
+                        MsgBox "Please enter valid produce dates"
+                        Exit Sub
+                    End If 'end of checking empty produce date
+                        'get specific product date
+                        pDate = Day(Sheet1.Range("G6").Value)
+                        pDate1 = Day(Sheet1.Range("G7").Value)
+                        pMonth = Month(Sheet1.Range("G6").Value)
+                        pMonth1 = Month(Sheet1.Range("G7").Value)
+                        pYear = Year(Sheet1.Range("G6").Value)
+                        pYear1 = Year(Sheet1.Range("G7").Value)
+                        
+                Else 'running non holiday tasks
+                    
+                    MsgBox "No holidays found. Files will be produced regularly."
+                    
+                    tDay = Weekday(Date)
+                        If 4 - tDay > 0 Then 'get the date if t +4oday is weekday before wednesday.
+                            pDate = Format((Date - tDay + 4), "dd")
+    
+                        ElseIf 4 - tDay = 0 Then 'get the date if today is wednesday
+                            pDate = Format(Date, "dd")
+    
+                        Else    'get the date if today is weekday after wednesday
+                            pDate = Format(Date, "dd") + 4 - tDay + 7
+                        End If
+                    pMonth = Format((Date), "mm")
+                    pYear = Year(Date)
+                    
+                    
+                    
+                    tDay = Weekday(Date + 7)
+                        If 4 - tDay > 0 Then 'get the date if today is weekday before wednesday.
+                            pDate1 = Format((Date + 7 + 4 - tDay), "dd")
+    
+                        ElseIf 4 - tDay = 0 Then 'get the date if today is wednesday
+                            pDate1 = Format(Date, "dd") + 7
+    
+                        Else    'get the date if today is weekday after wednesday
+                            pDate1 = Format(Date, "dd") + 7 + 4 - tDay + 7
+                        End If
+                    
+                    pMonth1 = Format((Date + 7), "mm")
+                    pYear1 = Year(Date + 7)
+                    
+              
+                End If 'End holiday check
+                
+                
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+'set url of webmenu
+webmenu = "http://webmenus/index2.html"
+Set ie = CreateObject("InternetExplorer.Application")
+'ie.Visible = True
+ie.navigate (webmenu)
+
+                            
+Do
+DoEvents
+Loop Until ie.readyState = 4
+                     
+
+Set inputTag = ie.document.getelementsbyTagName("input")
+
+'inputTag.item(0) is username
+inputTag.Item(0).Value = Sheet1.Range("c2").Value
+
+'inputTag.item(1) is password
+inputTag.Item(1).Value = Sheet1.Range("c3").Value
+
+    'check if username and password is empty
+    If inputTag.Item(0).Value <> "" And inputTag.Item(1).Value <> "" Then
+        inputTag.Item(2).Click  'click on login if both the username and password are filled
+
+            Do
+            DoEvents
+            Loop Until ie.readyState = 4
+            Application.Wait (Now + TimeValue("0:00:02"))
+            
+        Set Tags = ie.document.getelementsbyTagName("div")(0) 'check error message for login result
+        If InStr(Tags.innerText, "Error logging in please try again") <> 0 Then 'check loggin error msg
+            MsgBox "Error Loggin please try again." & vbNewLine & vbNewLine & "(Check your username and password)"
+            
+            Exit Sub 'Terminate all macro tasks if error exists
+        
+        Else
+            'run the function if there are no errors
+            Call naviToProduce(ie)
+            Call produceFile(ie, pDate, pDate1, pMonth, pMonth1, pYear, pYear1)
+            Call saveFile(pDate, pDate1, pMonth, pMonth1)
+            
+            'get item amount from product list
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+         End If 'end of check login error
+    
+    Else 'if username or password is blank then sent out notice
+        MsgBox "Please input your username and password"
+        
+    End If 'end of check  blank username or password
+    
+    Set ie = Nothing
+
+End Sub
+
+'this sub produce the files from the sheet1 list from T+1 and T+8
+Sub naviToProduce(ie As Object)
+Dim menuUrl
+
+
+
+'loop the list  to navigate to the page of Reproduce a Product for a Date Range
+Set menuUrl = ie.document.getelementsbyTagName("a")(6) 'AWI New Classification is located at item 7th in the list
+menuUrl.Click
+Application.Wait (Now + TimeValue("0:00:01"))
+
+Do
+DoEvents
+Loop Until ie.readyState = 4
+                     
+Set menuUrl = ie.document.getelementsbyTagName("a")(9) 'utilities Menu
+menuUrl.Click
+Application.Wait (Now + TimeValue("0:00:01"))
+
+Do
+DoEvents
+Loop Until ie.readyState = 4
+                     
+
+End Sub
+
+Function checkProduceDate() As Boolean
+    checkProduceDate = False
+    If Sheet1.Range("G6").Value = "" Or Sheet1.Range("G7").Value = "" Or VarType(Sheet1.Range("G6").Value) <> 7 Or VarType(Sheet1.Range("G7").Value) <> 7 Then 'check blank data for produce date
+        
+        checkProduceDate = True
+        End If 'end check blank produce date
+End Function
+
+Sub produceFile(ie As Object, pDate, pDate1, pMonth, pMonth1, pYear, pYear1)
+'insert prefix of the product/product start day/product end day
+Dim prefix As String
+Dim tag
+Dim i As Integer 'counter for running production
+Dim submitButtom
+
+
+Cells(12, 3).Value = "Producing..."
+Cells(12, 3).Font.Color = vbGreen
+
+For i = 1 To 4
+
+'highlight the calculating/producing file
+Cells(6 + i, 2).Interior.Color = RGB(255, 0, 0)
+
+Set tag = ie.document.getelementsbyTagName("a")(9) 'reproduce product for a date range
+tag.Click
+Application.Wait (Now + TimeValue("0:00:01"))
+
+'input production file prefix
+Set tag = ie.document.getelementsbyTagName("input")
+tag.Item(0).Value = Sheet1.Cells(6 + i, 2).Value
+
+'input product start date
+Set tag = ie.document.getelementsbyTagName("select")(0)
+tag.Focus
+tag.selectedIndex = pDate - 1
+tag.FireEvent "onchange"
+tag.Blur
+
+'input product start month
+Set tag = ie.document.getelementsbyTagName("select")(1)
+tag.Focus
+tag.selectedIndex = pMonth - 1
+tag.FireEvent "onchange"
+tag.Blur
+
+Set tag = ie.document.getelementsbyTagName("select")(2)
+tag.Focus
+tag.Value = pYear
+tag.FireEvent "onchange"
+tag.Blur
+
+'input product end date
+Set tag = ie.document.getelementsbyTagName("select")(3)
+tag.Focus
+tag.selectedIndex = pDate - 1
+tag.FireEvent "onchange"
+tag.Blur
+
+'input product end month
+Set tag = ie.document.getelementsbyTagName("select")(4)
+tag.Focus
+tag.selectedIndex = pMonth - 1
+tag.FireEvent "onchange"
+tag.Blur
+
+Set tag = ie.document.getelementsbyTagName("select")(5)
+tag.Focus
+tag.Value = pYear
+tag.FireEvent "onchange"
+tag.Blur
+
+'click on submit
+Set tag = ie.document.getelementsbyTagName("input")
+tag.Item(2).Click
+'click OK button again in the Confirmation Page
+Application.Wait (Now + TimeValue("0:00:01"))
+
+Set tag = ie.document.getelementsbyTagName("input")
+tag.Item(6).Click
+Application.Wait (Now + TimeValue("0:00:20"))
+
+Set tag = ie.document.getelementsbyTagName("a")(0)
+tag.Click
+Application.Wait (Now + TimeValue("0:00:02"))
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Set tag = ie.document.getelementsbyTagName("a")(9) 'reproduce product for a date range
+tag.Click
+Application.Wait (Now + TimeValue("0:00:01"))
+
+'input production file prefix
+Set tag = ie.document.getelementsbyTagName("input")
+tag.Item(0).Value = Sheet1.Cells(6 + i, 2).Value
+
+'input product start date
+Set tag = ie.document.getelementsbyTagName("select")(0)
+tag.Focus
+tag.selectedIndex = pDate1 - 1
+tag.FireEvent "onchange"
+tag.Blur
+
+'input product start month
+Set tag = ie.document.getelementsbyTagName("select")(1)
+tag.Focus
+tag.selectedIndex = pMonth1 - 1
+tag.FireEvent "onchange"
+tag.Blur
+
+Set tag = ie.document.getelementsbyTagName("select")(2)
+tag.Focus
+tag.Value = pYear1
+tag.FireEvent "onchange"
+tag.Blur
+
+'input product end date
+Set tag = ie.document.getelementsbyTagName("select")(3)
+tag.Focus
+tag.selectedIndex = pDate1 - 1
+tag.FireEvent "onchange"
+tag.Blur
+
+'input product end month
+Set tag = ie.document.getelementsbyTagName("select")(4)
+tag.Focus
+tag.selectedIndex = pMonth1 - 1
+tag.FireEvent "onchange"
+tag.Blur
+
+Set tag = ie.document.getelementsbyTagName("select")(5)
+tag.Focus
+tag.Value = pYear1
+tag.FireEvent "onchange"
+tag.Blur
+
+'click on submit
+Set tag = ie.document.getelementsbyTagName("input")
+tag.Item(2).Click
+'click OK button again in the Confirmation Page
+Application.Wait (Now + TimeValue("0:00:01"))
+
+Set tag = ie.document.getelementsbyTagName("input")
+tag.Item(6).Click
+Application.Wait (Now + TimeValue("0:00:20"))
+
+Set tag = ie.document.getelementsbyTagName("a")(0)
+tag.Click
+Application.Wait (Now + TimeValue("0:00:03"))
+
+Cells(6 + i, 2).Interior.Color = vbWhite
+
+Next 'loop the product list and produce all item
+Cells(12, 3).Value = "Producation Finished"
+
+End Sub
+
+Sub saveFile(pDate, pDate1, pMonth, pMonth1)
+Dim i As Integer
+Application.DisplayAlerts = False
+'save all produce file to specific location
+Dim indexofRes As String
+Dim folderName As String
+Dim tDate
+Dim wb As Workbook 'workbook for open files on webmenu
+
+tDate = Format(Date, "YYYYMMDD")
+Cells(13, 3).Value = "Downloading Production..."
+Cells(13, 3).Font.Color = vbRed
+
+
+'create folder for today's downloaded files
+folderName = "U:\Index\index production\Macros\RenaissanceCap\" & tDate
+If Dir(folderName, vbDirectory) <> "" Then
+
+    'Insert action for if the folder exists
+
+    Debug.Print folderName & " exists."
+Else
+    'Insert actions if the folder does not exist
+    MkDir folderName
+    Debug.Print folderName & " does not exist."
+End If
+
+
+For i = 1 To 4
+''''
+'get this wednesday files for (i)th product on the list
+indexofRes = "http://webmenus/res/world_index/" & Sheet1.Cells(6 + i, 2).Value & pDate & pMonth & ".csv"
+Set wb = Workbooks.Open(indexofRes)
+ChDir folderName
+Windows("RenaissanCapCheck.xlsm").Activate
+wb.SaveAs fileName:=folderName & "\" & Sheet1.Cells(6 + i, 2).Value & pDate & pMonth & ".csv", FileFormat:=xlCSV, CreateBackup:=False
+wb.Close
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'get next wednesday files for (i)th product on the list
+indexofRes = "http://webmenus/res/world_index/" & Sheet1.Cells(6 + i, 2).Value & pDate1 & pMonth1 & ".csv"
+Set wb = Workbooks.Open(indexofRes)
+ChDir folderName
+Windows("RenaissanCapCheck.xlsm").Activate
+wb.SaveAs fileName:=folderName & "\" & Sheet1.Cells(6 + i, 2).Value & pDate1 & pMonth1 & ".csv", FileFormat:=xlCSV, CreateBackup:=False
+wb.Close
+Next
+Set wb = Nothing
+
+'Do
+'DoEvents
+'Loop Until ie.readyState = 4
+MsgBox "Files are all produced and downloaded successfully." & vbNewLine & "Please validate these files."
+Cells(13, 3).Value = "Files are downloaded"
+End Sub
+
+
+
