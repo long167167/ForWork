@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CorporateActionCalendarStory
 {
+   
     public class TablePopulation
     {
         public string parentName { get; set; }
@@ -24,9 +25,12 @@ namespace CorporateActionCalendarStory
         public string childGrowth { get; set; }
         public string childDynamic { get; set; }
         public string childRSCC { get; set; }
+        public string parentExchange { get; set; }
+        public string childExchange { get; set; }
+     
         public TablePopulation()
         {
-
+            
         }
         
     }

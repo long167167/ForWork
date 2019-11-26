@@ -40,3 +40,43 @@ C:\Users\pauldobyns\Source\Repos\ForWork2\CorporateActionCalendarStory\Corporate
 C:\Users\pauldobyns\Source\Repos\ForWork2\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.exe
 C:\Users\pauldobyns\Source\Repos\ForWork2\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.pdb
 C:\Users\pauldobyns\source\repos\ForWork2\CorporateActionCalendarStory\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.csprojAssemblyReference.cache
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.csprojAssemblyReference.cache
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\MainWindow.baml
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\ImportDialog.g.cs
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\MainWindow.g.cs
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\App.g.cs
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory_MarkupCompile.cache
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory_MarkupCompile.lref
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\ImportDialog.baml
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.g.resources
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.Properties.Resources.resources
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.csproj.GenerateResource.cache
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.exe
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.pdb
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.exe.config
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.exe.manifest
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.application
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.exe
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.pdb
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.exe.manifest
+H:\MyDocuments\BI Developing\CA Calendar\20191021\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.application
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.exe.config
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.exe.manifest
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.application
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.exe
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\bin\Debug\CorporateActionCalendarStory.pdb
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.csprojAssemblyReference.cache
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\MainWindow.baml
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\ImportDialog.g.cs
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\MainWindow.g.cs
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\App.g.cs
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory_MarkupCompile.cache
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory_MarkupCompile.lref
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\ImportDialog.baml
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.g.resources
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.Properties.Resources.resources
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.csproj.GenerateResource.cache
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.exe.manifest
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.application
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.exe
+H:\MyDocuments\BI Developing\CA Calendar\DEV\CorporateActionCalendarStory\obj\Debug\CorporateActionCalendarStory.pdb

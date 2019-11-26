@@ -7,11 +7,11 @@
         mc:Ignorable="d"
         Title="Constituent Importer" Height="300" Width="300">
     <Grid>
-        <TextBlock HorizontalAlignment="Left" Height="23" Margin="10,26,0,0" TextWrapping="Wrap" Text="Would you like to import a parent and child?" VerticalAlignment="Top" Width="272"/>
-        <TextBlock HorizontalAlignment="Left" Margin="34,81,0,0" TextWrapping="Wrap" Text="Parent Ticker" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtParentTicker" HorizontalAlignment="Left" Height="23" Margin="34,102,0,0" TextWrapping="Wrap" Text="AAPL" VerticalAlignment="Top" Width="110"/>
-        <TextBlock HorizontalAlignment="Left" Margin="149,81,0,0" TextWrapping="Wrap" Text="Child Ticker" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtChildTicker" HorizontalAlignment="Left" Height="23" Margin="149,102,0,0" TextWrapping="Wrap" Text="MSFT" VerticalAlignment="Top" Width="110"/>
+        <TextBlock x:Name="ImportTitle" HorizontalAlignment="Left" Height="23" Margin="10,26,0,0" TextWrapping="Wrap" Text="Would you like to import a parent and child?" VerticalAlignment="Top" Width="272"/>
+        <TextBlock x:Name="parentLabel" HorizontalAlignment="Left" Margin="34,81,0,0" TextWrapping="Wrap" Text="Parent Ticker" VerticalAlignment="Top" IsHitTestVisible="False"/>
+        <TextBox x:Name="txtParentTicker" HorizontalAlignment="Left" Height="23" Margin="34,102,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="110"/>
+        <TextBlock x:Name="ChildTickerLabel" HorizontalAlignment="Left" Margin="149,81,0,0" TextWrapping="Wrap" Text="Child Ticker" VerticalAlignment="Top" IsHitTestVisible="False"/>
+        <TextBox x:Name="txtChildTicker" HorizontalAlignment="Left" Height="23" Margin="149,102,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="110"/>
         <Button x:Name="btnImportParent" Content="Import" HorizontalAlignment="Left" Margin="69,169,0,0" VerticalAlignment="Top" Width="75" Click="btnImport_Click"/>
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="149,169,0,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click"/>
 
