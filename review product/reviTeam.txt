@@ -1,0 +1,14 @@
+Sub getReviewList()
+'paste the review list
+
+'active the review team sheet
+    
+    Windows("excel developing.xlsm").Activate
+    Worksheets("Hoja2").Activate
+    ActiveSheet.UsedRange.Clear
+'paset contents
+    Cells(1, 1).Select
+    ActiveCell.Paste
+    
+
+End Sub

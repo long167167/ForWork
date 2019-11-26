@@ -1,0 +1,430 @@
+Option Explicit
+'Create by Long Ding 08/02/2019
+Sub reviewSheet()
+    
+'active the macro sheet
+   Windows("IM_review_product_check.xlsm").Activate
+   Call resetValidate
+' reviewSheet Macro
+' clear content
+'workbook name
+Dim iR As Workbook
+Dim ReviewFileName As String
+
+   'clear warnings to let macro go smooth
+   Application.ScreenUpdating = False
+   Application.DisplayAlerts = False
+   Call reSet
+   'clear the sheet
+   Sheet1.UsedRange.Clear
+   
+   ChDir "P:\Operations\Global Reviews\Review Products"
+   ReviewFileName = Application.GetOpenFilename("All Files(*.*), *.*")
+    
+   'copy the indication and paste the review sheet
+    Set iR = Workbooks.Open(Filename:= _
+        ReviewFileName, UpdateLinks:=0)
+        If ActiveSheet.AutoFilterMode Then
+ 
+    ActiveSheet.AutoFilterMode = False
+ 
+    End If
+    
+    Sheets("Review Products").Activate
+    Range("A1:Z7087").Select
+    
+    Selection.Copy
+    
+
+    Windows("IM_review_product_check.xlsm").Activate
+    
+    Range("A1").Select
+    ActiveSheet.Paste
+    
+    'clear filter
+    If ActiveSheet.AutoFilterMode Then
+ 
+    ActiveSheet.AutoFilterMode = False
+ 
+    End If
+
+'close the original indicative review sheet
+    iR.Close False
+    
+    Windows("IM_review_product_check.xlsm").Activate
+'adjust the layout of view
+    Columns("A:S").Select
+    Columns("A:S").EntireColumn.AutoFit
+    Rows("1:30").Select
+    Rows("1:1").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Rows("1:7087").EntireRow.AutoFit
+
+'filter American region files
+Call getCon
+
+Call getTracker
+
+Call getPMC
+'format date type in European Type
+Sheets("Open Cons Result").Activate
+Call dateFormat
+Sheets("Tracker Result").Activate
+Call dateFormat
+
+'''''''''''''''''''''''''''''''
+
+Call cleanOpenCon 'Remove the Trackers from the Open Cons Result sheets
+
+End Sub
+
+
+Sub getCon()
+'create open cons result worksheet
+Dim ws As Worksheet
+Set ws = Sheets.Add(Type:=xlWorksheet)
+With ws
+    .Name = "Open Cons Result"
+End With
+
+
+Dim i As Integer 'row counter in sheet1
+Dim a As Integer 'row counter in open cons sheet
+
+
+Sheet1.Activate
+Dim webMenu As String 'web menue column- product region
+
+'reset i, the row counter to 1
+i = 8
+a = 1
+
+
+Do Until Cells(i, 2) = ""
+
+    webMenu = Cells(i, 5).Value
+    
+    Select Case webMenu
+
+    Case "Americas & GPro Production Menu", "Americas & GPro Production Menu (Trackers)", "Andean40 (6)", "AW Review Opening Cons (12)", "AW Review Tracker (11)", "AWI New Classification", "Brazil Production Run", "Custom and Quant: (30)", "GPro Review Opening Cons (11,4,2,5)", "GPro Review Opening Cons (5)", "GPro Review T+10 Tracker (5)", "US Production Run (58)", "US Production Run (58) Quarterly Review Tracker (6)", "US Webmenus", "World Product Production Menu", "World reviews", "World reviews (22,2,3)", "World Product Production Menu"
+        'first case is all list item from america region
+        Call filterAmeri(i, a)
+    Case "PMC"
+        Call nonAmeri(i, a)
+   
+    Case Else
+    'no america region without DDS being reproted  /'PMC' is included into non americas region
+        Call nonAmeri(i, a)
+
+    End Select 'end select from web Menu
+i = i + 1
+Loop 'end filter to get America region
+
+Sheets("Open Cons Result").Range("A:E").EntireColumn.AutoFit
+Call dateFormat
+End Sub
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''\
+Sub getPMC()
+Dim ws As Worksheet
+Set ws = Sheets.Add(Type:=xlWorksheet)
+With ws
+    .Name = "PMC"
+End With
+
+Dim i As Integer 'row counter
+
+If Sheets("Open Cons Result").Range("A1") <> "" Then
+'copy all filter result from indicative sheet
+        Sheets("Open Cons Result").Select
+        i = Range("A1").End(xlDown).Row
+        Range(Cells(1, 1), Cells(i, 5)).Copy
+        Sheets("PMC").Activate
+        Cells(1, 1).Select
+        ActiveSheet.Paste
+
+
+        'reset i = 1st row
+        i = 1
+        Do Until ws.Cells(i, 1) = ""  'loop through the whole table in PMC sheet
+                If InStr(ws.Cells(i, 4).Value, "PMC") = 0 Then 'delete row has not contained "track" string
+                ws.Rows(i).Delete
+                i = i - 1
+                End If 'end of getting PMC
+    
+                i = i + 1
+        Loop ' end of looping table in PMC sheet
+        
+        
+        Sheets("Open Cons Result").Activate
+        i = 1
+        Do Until Sheets("Open Cons Result").Cells(i, 1) = "" 'loop through table from open con sheet
+        
+        
+        If InStr(Sheets("Open Cons Result").Cells(i, 4).Value, "PMC") <> 0 Then 'delete row has not contained "track" string
+                Sheets("Open Cons Result").Rows(i).Delete
+                i = i - 1
+        End If 'end of getting PMC
+                i = i + 1
+        Loop 'end looping/delete open cons table
+        
+End If ' end of getting PMC from open cons
+
+
+End Sub
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'get nonAmeri + no DDS reports products
+Sub nonAmeri(i As Integer, a As Integer)
+'''''''''''''''''''''''''''''''''''''
+
+
+Dim ExpectedFirstDate As Date
+ExpectedFirstDate = Date + 1 'T+1   for the parameter   , and we will set filter   <T+1
+Dim EffectiveDate As Date
+EffectiveDate = Date
+
+
+Sheet1.Activate
+''''''''''''''''''''''''''''''''''''''''''''
+
+   If VarType(Cells(i, 12).Value) <> 10 And VarType(Cells(i, 14).Value) <> 10 Then ' check the data is not error type
+    If Cells(i, 12).Value < ExpectedFirstDate And Cells(i, 16).Value = "Y" And VarType(Cells(i, 19).Value) <> 8 Then 'check Expected First Day/ ready for delivery"Y"/ DDS no report
+        If Cells(i, 14).Value > Date Or Cells(i, 14).Value = "TBC" Then 'check Review Effective Date
+            
+      
+                
+                Sheets("Open Cons Result").Cells(a, 1).Value = Sheet1.Cells(i, 2).Value
+                Sheets("Open Cons Result").Cells(a, 2).Value = Sheet1.Cells(i, 3).Value
+                Sheets("Open Cons Result").Cells(a, 3).Value = Sheet1.Cells(i, 4).Value
+                Sheets("Open Cons Result").Cells(a, 4).Value = Sheet1.Cells(i, 5).Value
+                Sheets("Open Cons Result").Cells(a, 5).Value = Sheet1.Cells(i, 19).Value
+                a = a + 1
+            End If ' End check Review Datt
+
+    End If ' end Check Expected First Day and the Review Effective Date
+    End If 'end check the data error
+    
+    
+    
+
+
+End Sub
+
+
+Sub filterAmeri(i As Integer, a As Integer)
+Dim ExpectedFirstDate As Date
+ExpectedFirstDate = Date + 1 'T+1   for the parameter   , and we will set filter   <T+1
+Dim EffectiveDate As Date
+EffectiveDate = Date
+
+
+Sheet1.Activate
+''''''''''''''''''''''''''''''''''''''''''''
+
+   If VarType(Cells(i, 12).Value) <> 10 And VarType(Cells(i, 14).Value) <> 10 Then ' check the data is not error type
+    If Cells(i, 12).Value < ExpectedFirstDate And Cells(i, 16).Value = "Y" Then 'check Expected First Day
+        If Cells(i, 14).Value > Date Or Cells(i, 14).Value = "TBC" Then 'check Review Effective Date
+            
+      
+                
+                Sheets("Open Cons Result").Cells(a, 1).Value = Sheet1.Cells(i, 2).Value
+                Sheets("Open Cons Result").Cells(a, 2).Value = Sheet1.Cells(i, 3).Value
+                Sheets("Open Cons Result").Cells(a, 3).Value = Sheet1.Cells(i, 4).Value
+                Sheets("Open Cons Result").Cells(a, 4).Value = Sheet1.Cells(i, 5).Value
+                
+                a = a + 1
+
+            End If ' End check Review Datt
+
+    End If ' end Check Expected First Day and the Review Effective Date
+    End If 'end check the data error
+    
+    
+    
+   
+End Sub
+
+
+'copy and paste result for Tracker
+Sub getTracker()
+Dim i As Integer 'counter of row
+
+'creat an new sheet for filter results
+Dim ws As Worksheet
+Set ws = Sheets.Add(Type:=xlWorksheet)
+With ws
+    .Name = "Tracker Result"
+End With
+
+If Sheets("Open Cons Result").Range("A1") <> "" Then
+'copy all filter result from indicative sheet
+Sheets("Open Cons Result").Select
+i = Range("A1").End(xlDown).Row
+Range(Cells(1, 1), Cells(i, 5)).Copy
+Sheets("Tracker Result").Activate
+Cells(1, 1).Select
+ActiveSheet.Paste
+''''''''''''''''''''''''''''''''''''''''''
+''
+'Delete all none tracker row
+
+'reset i = 1st row
+i = 1
+Do Until Cells(i, 1) = ""  'loop through the whole table
+    
+    'get TBC and  set all TBC = T+1
+    If Cells(i, 2).Value = "TBC" Then
+    
+       If Weekday(Date) < 6 Then 'Check today's weekday ///today is Sunday -thursday
+        Cells(i, 2).Value = (Date + 1)
+        
+        ElseIf Weekday(Date) = 6 Then 'today is Friday
+        Cells(i, 2).Value = (Date + 3)
+        
+        ElseIf Weekday(Date) = 7 Then 'today is Saturday
+        Cells(i, 2).Value = (Date + 2)
+        End If 'end check today's weekday
+    End If 'end get and set TBC
+    
+    If InStr(Cells(i, 4).Value, "Tracker") = 0 Then 'delete row has not contained "track" string
+       
+   
+        Rows(i).Delete
+            
+        i = i - 1
+    End If
+
+i = i + 1
+Loop 'End loop the table
+
+
+ Sheets("Tracker Result").Range("A:E").EntireColumn.AutoFit
+    Call dateFormat
+Else
+    Sheets("Tracker Result").Range("A1").Value = "No Data"
+    
+End If
+End Sub
+
+
+
+''for Format the Date in European stype  ddmmyyyy
+Sub dateFormat()
+Dim x As Integer
+Dim y As Integer
+Dim d
+Dim s As String
+x = 1
+y = 1
+
+
+Do While Cells(x, y) <> ""
+
+    Do Until y > 5
+        If VarType(Cells(x, y).Value) = vbDate Then
+            
+            d = Format(Cells(x, y), "ddmmyyyy")
+            s = CStr(d)
+            Cells(x, y).Select
+            Selection.NumberFormat = "@"
+            Cells(x, y).Value = s
+
+        End If
+        
+        y = y + 1
+    Loop
+    
+    x = x + 1
+    y = 1
+Loop
+
+End Sub
+
+' reset/delete previous result sheets, filter results
+Sub reSet()
+
+    Dim i As Integer
+   Application.ScreenUpdating = False
+   Application.DisplayAlerts = False
+   
+    Sheet1.Activate
+        
+    If ActiveSheet.AutoFilterMode Then
+ 
+    ActiveSheet.AutoFilterMode = False
+ 
+    End If
+    i = Worksheets.Count
+    
+   Do While i > 0
+    
+     If Worksheets(i).Name = "Open Cons Result" Then
+    
+        Worksheets(i).Delete
+        
+      End If
+      i = i - 1
+    
+    Loop
+    
+    
+    i = Worksheets.Count
+   Do While i > 0
+     
+    
+     If Worksheets(i).Name = "Tracker Result" Or Worksheets(i).Name = "PMC" Then
+    
+        Worksheets(i).Delete
+        
+       End If
+        i = i - 1
+    Loop
+    
+
+End Sub
+
+Sub resetValidate()
+Sheets("Validation").Activate
+Dim rowNum As Integer
+If Cells(1, 1) <> "" Then
+    
+        If Cells(1, 2) <> "" Then
+            rowNum = Range("A1").End(xlDown).Row
+            Range(Cells(1, 1), Cells(rowNum, 5)).ClearContents
+            Cells(1, 1) = "Please Copye and Paste Review Team's list here."
+        Else
+            Cells(1, 1) = "Please Copye and Paste Review Team's list here."
+        End If
+Else
+    Cells(1, 1) = "Please Copye and Paste Review Team's list here."
+End If
+
+Range(Cells(2, 7), Cells(9999, 12)).ClearContents
+Cells(3, 6) = 0
+Cells(5, 6) = 0
+End Sub
+
+
+Sub cleanOpenCon()
+' remove tracker from open cons sheet
+Dim i As Integer 'row couter
+i = 1
+Sheets("Open Cons Result").Activate
+
+'loop the whole list
+Do Until Cells(i, 1) = ""
+If InStr(Cells(i, 4), "Tracker") <> 0 Then 'Delete Tracker table
+ Rows(i).Delete
+    i = i - 1
+End If
+    i = i + 1
+Loop 'end looping table
+End Sub
+
+
+
+
+

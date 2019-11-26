@@ -1,0 +1,160 @@
+Sub listValidate()
+Call resetResult
+If Cells(1, 2) = "" Then
+    MsgBox "The Review Team's List is no found."
+Else
+
+        Dim rowE As Integer
+        'copy data from open con result
+        Sheets("Open Cons Result").Activate
+        rowE = Range("A9999").End(xlUp).Row
+        If rowE > 1 Then
+        
+            Range(Cells(1, 1), Cells(rowE, 3)).Select
+            Selection.Copy
+        
+            'paste list in validation tag
+            Sheets("validation").Activate
+            rowE = Range("A9999").End(xlUp).Row
+        
+            Cells(2, 7).Select
+            ActiveSheet.Paste
+        End If
+        
+         'copy data from tracker result
+        Sheets("Tracker Result").Activate
+        rowE = Range("A9999").End(xlUp).Row
+        If rowE > 1 Then
+        
+            Range(Cells(1, 1), Cells(rowE, 3)).Select
+            Selection.Copy
+        
+            'paste list in validation tag
+            Sheets("validation").Activate
+            rowE = Range("G99999").End(xlUp).Row
+        
+            Cells(rowE + 1, 7).Select
+            ActiveSheet.Paste
+        End If
+        
+            'copy data from PMC
+        Sheets("PMC").Activate
+        rowE = Range("A9999").End(xlUp).Row
+        If rowE > 1 Then
+        
+            Range(Cells(1, 1), Cells(rowE, 3)).Select
+            Selection.Copy
+        
+            'paste list in validation tag
+            Sheets("validation").Activate
+            rowE = Range("G99999").End(xlUp).Row
+        
+            Cells(rowE + 1, 7).Select
+            ActiveSheet.Paste
+        End If
+        
+        
+        Sheets("validation").Activate
+        Call countList
+        Call lookupList
+        
+        
+        Range("A1:L9999").Borders.LineStyle = Excel.XlLineStyle.xlLineStyleNone
+End If
+End Sub
+
+Sub countList()
+'counting numbers of item in each list and comparing
+Dim list1 As Integer
+Dim list2 As Integer
+list1 = 0
+list2 = 0
+'count of review team list
+If Cells(2, 1) <> "" And Cells(2, 7) <> "" Then
+    list1 = Range("A1").End(xlDown).Row
+    'count of you list
+    list2 = Range("G1").End(xlDown).Row - 1
+Else: MsgBox "No review products"
+End If
+
+Cells(3, 6).Value = list2
+Cells(5, 6).Value = list1
+
+
+End Sub
+Sub lookupList()
+'
+' vlookup Macro
+    Dim rowX As Integer
+    Dim lookupValue As String
+    
+If Cells(2, 6) <> "" Then
+    rowX = Range("G1").End(xlDown).Row
+    Range("J2").Select
+    ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[-3],C[-8]:C[-7],1,0)"
+    Range("J2").Select
+    Selection.AutoFill Destination:=Range(Cells(2, 10), Cells(rowX, 10))
+    
+    'conditional highlight
+    Range("J2").Select
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+        Formula1:="=$G2"
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    With Selection.FormatConditions(1).Font
+        .Color = -16752384
+        .TintAndShade = 0
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 13561798
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+    Selection.AutoFill Destination:=Range(Cells(2, 10), Cells(rowX, 10))
+    
+   'copy Column A  paste to RV list to Column K
+    rowX = Range("a1").End(xlDown).Row
+    Range(Cells(1, 2), Cells(rowX, 2)).Copy
+    Cells(2, 11).Select
+    ActiveSheet.Paste
+    
+    'vlookup RV list against to your list
+    lookupValue = Cells(2, 11).Value
+    Range("L2").Select
+    ActiveCell.FormulaR1C1 = "=VLOOKUP(RC[-1],C[-5],1,0)"
+    rowX = Range("K1").End(xlDown).Row
+    Range("L2").Select
+    Selection.AutoFill Destination:=Range(Cells(2, 12), Cells(rowX, 12))
+    
+        
+    'conditional highlight
+    Range("L2").Select
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+        Formula1:="=$K2"
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    With Selection.FormatConditions(1).Font
+        .Color = -16752384
+        .TintAndShade = 0
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 13561798
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+    Selection.AutoFill Destination:=Range(Cells(2, 12), Cells(rowX, 12))
+    
+    
+    
+End If
+
+End Sub
+
+Sub resetResult()
+Sheets("Validation").Activate
+
+Range(Cells(2, 7), Cells(9999, 12)).ClearContents
+Cells(3, 6) = 0
+Cells(5, 6) = 0
+End Sub
+

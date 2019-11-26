@@ -1,0 +1,85 @@
+Sub exportFile()
+Application.ScreenUpdating = False
+Application.DisplayAlerts = False
+
+Dim myfileName As Variant
+Dim wb As Workbook
+Dim wb1 As Workbook
+
+
+myfileName = ThisWorkbook.Path & "\OpenCon" & Format((Date), "yyyymmdd") & ".csv"
+
+'save open con
+Set wb = Workbooks.Add
+With wb
+    .SaveAs Filename:=myfileName, FileFormat:=xlCSV
+End With
+
+'copy filter result from indicative sheet
+Workbooks("IM_review_product_check").Sheets("Open Cons Result").Activate
+
+Dim i As Integer
+
+i = Range("A9999").End(xlUp).Row
+
+If i > 0 Then
+    Range(Cells(1, 1), Cells(i, 3)).Select
+    Selection.Copy
+
+
+    wb.Activate
+    Cells(1, 1).Select
+    ActiveSheet.Paste
+
+    Columns("A:D").EntireColumn.AutoFit
+Else
+    wb.Activate
+    
+    Cells(1, 1).Value = "No Open Con is found today"
+
+End If
+
+wb.Save
+ActiveWorkbook.Close False
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'save tracker
+
+myfileName = ThisWorkbook.Path & "\Tracker" & Format((Date), "yyyymmdd") & ".csv"
+
+
+Set wb1 = Workbooks.Add
+With wb1
+    .SaveAs Filename:=myfileName, FileFormat:=xlCSV
+End With
+
+Workbooks("IM_review_product_check").Sheets("Tracker Result").Activate
+
+i = Range("A9999").End(xlUp).Row
+
+If i > 0 Then
+    Range(Cells(1, 1), Cells(i, 2)).Select
+    Selection.Copy
+
+    wb1.Activate
+    Cells(1, 1).Select
+    ActiveSheet.Paste
+    Columns("A:D").EntireColumn.AutoFit
+   
+Else
+    wb1.Activate
+    Cells(1, 1).Value = "No Tracker is found today"
+
+End If
+
+wb1.Save
+ActiveWorkbook.Close False
+
+Workbooks("IM_review_product_check").Activate
+Sheets("Open Cons Result").Delete
+Sheets("Tracker Result").Delete
+
+End Sub
+
+
+

@@ -1,0 +1,42 @@
+Option Explicit
+
+Sub reSet()
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+    Dim i As Integer
+    
+    Sheet1.Activate
+        
+    If ActiveSheet.AutoFilterMode Then
+ 
+    ActiveSheet.AutoFilterMode = False
+ 
+    End If
+    i = Worksheets.Count
+    
+   Do While i > 0
+    
+     If Worksheets(i).Name = "Open Cons Result" Then
+    
+        Worksheets(i).Delete
+        
+      End If
+      i = i - 1
+    
+    Loop
+    
+    
+    i = Worksheets.Count
+   Do While i > 0
+     
+    
+     If Worksheets(i).Name = "Tracker Result" Then
+    
+        Worksheets(i).Delete
+        
+       End If
+        i = i - 1
+    Loop
+    
+
+End Sub
