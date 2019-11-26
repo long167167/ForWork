@@ -1,0 +1,5 @@
+1. fix the code that igorne all jpg, img, pdf, txt files
+
+2. fix the highlight backup text -- search string function
+
+3. add ixBRL search method.

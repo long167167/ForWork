@@ -1,0 +1,24 @@
+08/19/2019
+SEC UI initial form created
+
+08/23/2019
+connect and filtering function (ticker search/company search) with SEC.org
+
+08/26/2019
+studying RSS Feed for VBA
+
+09/01/2019
+pulled and formated RSS Feed in the Excel
+
+09/01/2019
+add function to get real form URL from the links of RSS list
+
+09/03/2019
+functions to search string of input cShare in the throught the SEC forms
+
+09/04/2019 
+add hightlight function
+SEC ixBRL form studying
+
+09/05/2019
+debugging
