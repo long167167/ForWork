@@ -1,0 +1,435 @@
+Option Explicit
+Sub MajorTables()
+'the sub combines tables from Eikon event\lseg world report- Dividend Integrity Report(t and t+1)\lseg world report- cap Integrity Report(t and t + 1)
+            'and div report from yesterday
+
+'Pre-steps:  prior of running this marco, there are a couple of steps need to be done for genernating the original excel files of Eikon and lseg-world report
+
+    '1 query the dividend report from Eikon -The Div Amount preferences from the report needs to be selected.
+    '2 this marco will pull the Ammc file autamically, but please make sure the updated copy of ammc file is existed in the proper location.(2 dividend check guideline)
+    '3LSEG World Reports need to be copied and pasted into the to correspond worksheets                             The worksheets are created automatically in below order:
+       'today 's dividend
+       'T+1 dividend
+       'today 's Cap
+       'T 1 's Cap
+       'T-1's dividend report needs to be done, copied and pasted
+
+Dim ad As Workbook 'yyyymmdd_All_Dividends
+Dim fileName As String 'file name = yyyymmdd & _All_Dividend_ & report maker's initial
+Dim initName As String 'initial of report maker's name
+Dim formatedDate
+Dim today1 As Date
+Dim nameYear
+
+   Application.ScreenUpdating = False
+   Application.DisplayAlerts = False
+   
+'get fileName --- today's date & _All_Dividend_ & report maker's initial
+initName = Range("L3").Value
+today1 = Date
+nameYear = Year(today1)
+formatedDate = Format(today1, "yyyymmdd")
+fileName = formatedDate & "_All_Dividend_" & initName
+
+
+
+
+'open and access event sheet- workbook
+Set ad = Workbooks.Open(fileName:= _
+    "F:\Sign Offs\Americas\EIKON CHECKS\ALL_DIVs\" & nameYear & "\" & fileName & ".xlsx", UpdateLinks:=0)
+
+'reset filters for the sheet
+    If ActiveSheet.AutoFilterMode Then
+    ActiveSheet.AutoFilterMode = False
+    End If
+
+'active events sheet
+Sheets("Events").Activate
+Call formateEvents
+'add Ammc sheet and data
+Call ammc(fileName)
+
+'add div,div+1, cap, cap+1, yesterday dividend tags
+Call workingTags
+Call validateBtn
+
+   Application.ScreenUpdating = True
+   Application.DisplayAlerts = True
+End Sub
+
+Sub ammc(fileName As String)
+'copy and paste data from today's ammcDDMM in O: drive
+
+
+Dim ammc As Worksheet
+Dim Tdate As String 'get today's date for the ammc file name
+Dim oammc As String 'name of ammcDDMM
+
+Dim ammcbook As Workbook
+Dim Td As Date 'for formated today's date
+Dim Td1
+Dim i As Integer 'Sheets counter
+Dim exists As Boolean
+exists = False
+
+Application.ScreenUpdating = False
+Application.DisplayAlerts = False
+Td = Date
+
+'Add the sheet for Ammc data
+
+'loop sheet name to check exist of sheet
+ For i = 1 To Worksheets.Count
+    'if the sheet exists, then stop creating
+    If Worksheets(i).Name = "Ammc" Then
+       
+        exists = True
+        MsgBox "Ammc sheet Exists."
+        
+        Exit For
+        
+    End If
+Next i
+
+ 'create the sheet if it does exist
+If exists = False Then
+
+Set ammc = Sheets.Add(after:=Sheets(Worksheets.Count))
+
+With ammc
+     .Name = "Ammc" 'name the sheet as Ammc
+End With
+
+'get today's date for the AmmcDDMM file location
+Td1 = Format(Td, "ddmm")
+Tdate = CStr(Td1)
+
+'open ammc file for today in O: drive AmmcDDMM
+Set ammcbook = Workbooks.Open(fileName:="O:\ammc" & Tdate & ".csv", UpdateLinks:=0)
+
+
+
+'copy all content of ammc
+Range("A1:Z7087").Select
+Selection.Copy
+
+'paste selection into ammc sheet of the ddmmyyy_All_Dividends workbook
+Windows(fileName & ".xlsx").Activate
+Range("A1").Select
+ActiveSheet.Paste
+
+'clear filter
+If ActiveSheet.AutoFilterMode Then
+ActiveSheet.AutoFilterMode = False
+End If
+'close original ammc file
+ammcbook.Close
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'format column of Sedol
+
+Sheets("Ammc").Activate
+Dim y As Integer 'column counter
+y = 1
+Do Until Cells(4, y).Value = "CODE - RIC"
+
+y = y + 1
+
+Loop
+
+Columns(y).Select
+Selection.Cut
+Columns("B:B").Select
+Selection.Insert Shift:=xlToRight
+
+'''''''''''''''''''''''''''''''''''''''''''''
+Application.ScreenUpdating = True
+Application.DisplayAlerts = True
+
+End If '"Ammc" sheet created finish
+
+
+End Sub
+
+Sub workingTags()
+
+Application.ScreenUpdating = True
+Application.DisplayAlerts = True
+
+'create tags for other needed worksheet
+Dim i As Integer ' set i to be sheets counter
+Dim exists As Boolean
+exists = False
+
+'loop sheet name to check exist of sheet
+ For i = 1 To Worksheets.Count
+    'if the sheet exists, then stop creating
+    If Worksheets(i).Name = "Div" Then
+       
+        exists = True
+        MsgBox "Div sheet Exists."
+        
+        Exit For
+        
+    End If
+Next i
+
+ 'create the sheet if it does exist
+If exists = False Then
+    Worksheets.Add(after:=Sheets(Worksheets.Count)).Name = "Div"
+End If '"div" sheet created finish
+
+'reset sheet exists checker
+exists = False
+'create div +1 sheet
+'loop sheet name to check exist of sheet
+ For i = 1 To Worksheets.Count
+    'if the sheet exists, then stop creating
+    If Worksheets(i).Name = "Div+1" Then
+       
+        exists = True
+        MsgBox "Div+1 sheet Exists."
+        
+        Exit For
+        
+    End If
+Next i
+
+ 'create the sheet if it does exist
+If exists = False Then
+    Worksheets.Add(after:=Sheets(Worksheets.Count)).Name = "Div+1"
+End If '"div+1" sheet created finish
+
+
+'reset sheet exists checker
+exists = False
+'create cap sheet
+'loop sheet name to check exist of sheet
+ For i = 1 To Worksheets.Count
+    'if the sheet exists, then stop creating
+    If Worksheets(i).Name = "Cap" Then
+       
+        exists = True
+        MsgBox "Cap sheet Exists."
+        
+        Exit For
+        
+    End If
+Next i
+
+ 'create the sheet if it does exist
+If exists = False Then
+    Worksheets.Add(after:=Sheets(Worksheets.Count)).Name = "Cap"
+End If '"Cap" sheet created finish
+
+
+'reset sheet exists checker
+exists = False
+'create cap+1 sheet
+'loop sheet name to check exist of sheet
+ For i = 1 To Worksheets.Count
+    'if the sheet exists, then stop creating
+    If Worksheets(i).Name = "Cap+1" Then
+       
+        exists = True
+        MsgBox "Cap+1 sheet Exists."
+        
+        Exit For
+        
+    End If
+Next i
+
+ 'create the sheet if it does exist
+If exists = False Then
+    Worksheets.Add(after:=Sheets(Worksheets.Count)).Name = "Cap+1"
+End If '"Cap+1" sheet created finish
+
+'reset sheet exists checker
+exists = False
+'create Yesterday Div sheet
+'loop sheet name to check exist of sheet
+ For i = 1 To Worksheets.Count
+    'if the sheet exists, then stop creating
+    If Worksheets(i).Name = "Yesterday_Div" Then
+       
+        exists = True
+        MsgBox "Yesterday_Div sheet Exists."
+        
+        Exit For
+        
+    End If
+Next i
+
+ 'create the sheet if it does exist
+If exists = False Then
+    Worksheets.Add(after:=Sheets(Worksheets.Count)).Name = "Yesterday_Div"
+End If '"Yesterday_Div" sheet created finish
+
+End Sub
+
+Sub formateEvents()
+Dim checkAmmc As Boolean
+checkAmmc = False
+'format the eventsheets
+
+Dim i As Integer 'set i to be the counter of column
+Dim x As Integer ' get x as counter of rows
+i = 1
+
+'de-activate the warnings for macro running smooth
+Application.ScreenUpdating = False
+Application.DisplayAlerts = False
+
+'activate Events sheet
+Sheets("Events").Activate
+
+'loop through the table heads to find the column of Div Amount
+'''''''''''''''''''''''''''''''''''''
+'check exist of Ammc
+Do Until Cells(6, i).Value = ""
+
+    If Cells(6, i).Value = "Ammc" Then
+    checkAmmc = True
+    Exit Do
+    End If
+    i = i + 1
+    
+Loop '' check exists of Ammc
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+If checkAmmc = False Then
+i = 1
+Do Until Cells(6, i).Value = "Div Amount" Or Cells(6, i).Value = ""
+i = i + 1
+Loop ' end looping table head
+
+
+'select used range from Div Amount Column and delimit them.
+
+Cells(6, i).Select
+x = Cells(6, 1).End(xlDown).Row
+Range(Cells(6, i), Cells(x, i)).Select
+Selection.TextToColumns Destination:=Cells(6, i), DataType:=xlDelimited, _
+TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=True, Tab:=False, _
+Semicolon:=False, Comma:=False, Space:=True, Other:=False, FieldInfo _
+:=Array(Array(1, 1), Array(2, 1)), TrailingMinusNumbers:=True
+
+
+Cells(6, i).Value = "Div Amount"
+Call insertCol(i)
+Call removeBlankCol
+End If
+'activate waring alars aftering finishing formating
+Application.ScreenUpdating = True
+Application.DisplayAlerts = True
+
+
+End Sub
+
+Sub insertCol(i As Integer)
+'insert 5 column into the Events sheet table and named them
+Dim x As Integer 'row counter for getting table border format
+x = Range("A7").End(xlDown).Row
+Worksheets("Events").Range(Columns(i + 1), Columns(i + 5)).EntireColumn.Insert
+Cells(6, i + 1).Value = "Ammc"
+Cells(6, i + 2).Value = "div"
+Cells(6, i + 3).Value = "div+1"
+Cells(6, i + 4).Value = "diff"
+Cells(6, i + 5).Value = "notes"
+Range(Cells(6, i), Cells(x, i)).Copy
+Cells(6, i + 6).Select
+ActiveSheet.Paste
+Range(Cells(6, i + 1), Cells(x, i + 6)).Select
+With Selection.Borders
+    .LineStyle = xlContinuous
+    .Color = vbBlack
+    .Weight = xlThin
+End With
+
+Range(Cells(7, i + 1), Cells(x, i + 5)).Select
+With Selection
+    .Interior.ColorIndex = 34
+End With
+
+End Sub
+
+Sub removeBlankCol()
+'remove blank column/non useful column  "Dial-In", "Transcript",  "Brief",   "Presentations",   "Audio",   "MP3", "Guidance","Unit"
+
+
+Dim i As Integer 'regular counter for column
+Dim thead As String 'table head
+i = 1
+
+Do While Cells(6, i) <> "" 'the table head th start from  cells(6,1), we loop through the th row, and stop when at blank cell
+thead = Cells(6, i).Value 'assign thead = table head in row 6
+Select Case thead
+
+Case "Dial-In", "Transcript", "Brief", "Presentations", "Audio", "MP3", "Guidance", "Unit"
+Columns(i).Delete
+i = i - 1
+End Select
+
+i = i + 1
+Loop
+
+End Sub
+
+Sub validateBtn()
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' add validate
+' btn Macro
+'
+
+    Sheets("Events").Activate
+    
+Dim shp
+Dim shpName As Boolean
+shpName = False
+For Each shp In Sheets("Events").Buttons
+    If shp.Name = ("Button 1") Then
+        shpName = True
+    
+    Exit For
+    End If
+Next
+
+If shpName = False Then
+    Range("E1").Select
+    ActiveSheet.Buttons.Add(384.75, 6, 72, 72).Select
+    Selection.OnAction = "dividenCheck.xlsm!validate"
+    Selection.Characters.Text = "Button 1"
+    With Selection.Characters(Start:=1, Length:=8).Font
+        .Name = "Calibri"
+        .FontStyle = "Regular"
+        .Size = 11
+        .Strikethrough = False
+        .Superscript = False
+        .Subscript = False
+        .OutlineFont = False
+        .Shadow = False
+        .Underline = xlUnderlineStyleNone
+        .ColorIndex = 1
+    End With
+    ActiveSheet.Shapes("Button 1").ScaleWidth 3.2456140351, msoFalse, _
+        msoScaleFromTopLeft
+    ActiveSheet.Shapes("Button 1").ScaleHeight 1.56, msoFalse, msoScaleFromTopLeft
+    Selection.Characters.Text = "Validate Dividend"
+    With Selection.Characters(Start:=1, Length:=17).Font
+        .Name = "Calibri"
+        .FontStyle = "Regular"
+        .Size = 11
+        .Strikethrough = False
+        .Superscript = False
+        .Subscript = False
+        .OutlineFont = False
+        .Shadow = False
+        .Underline = xlUnderlineStyleNone
+        .ColorIndex = 1
+    End With
+    Range("G2").Select
+End If
+''end adding validate marco button
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+End Sub

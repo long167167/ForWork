@@ -1,0 +1,490 @@
+Option Explicit
+Sub validate()
+'check Div with Events Sheet
+If Sheets("Div").Range("A4") = "" Or Sheets("Div+1").Range("A5") = "" Then
+ MsgBox "Files missing!! Please make sure your have all reports from LSEG World Report ready."
+
+Else
+
+Call getSedol 'get sedol from ammc
+Call checkDiv  'validate div from div sheet
+Call checkDiv1  'validate div from div+1 sheet
+Call diffFind   'get difference from div amount vs div and div+1
+Call divReverse   'do a reverse vlookup check between Div and Events sheet
+Call div1Reverse  'do a reverse vlookup check to the Events sheets Eikon div
+
+End If
+End Sub
+
+Sub getSedol()
+'get sedol from Ammc sheet
+Sheets("Events").Activate
+Dim iRIC As Integer 'irow is row counter
+Dim iCol As Integer 'icol is column counter
+Dim ammc As Integer 'ammc row
+Dim iRow As Integer
+iRow = 7
+
+
+
+ammc = 1
+'loop through table head in row 6 to find the "Ammc" column
+Do Until Cells(6, ammc).Value = "Ammc"
+
+ammc = ammc + 1
+Loop 'end find Ammc column
+
+
+iRIC = 1
+'loop through table head in row 6 to find the "RIC" column
+Do Until Cells(6, iRIC).Value = "RIC"
+
+iRIC = iRIC + 1
+Loop 'end find RIC
+
+
+Do While Cells(iRow, iRIC).Value <> ""
+
+Cells(iRow, ammc).Value = Application.VLookup(Cells(iRow, iRIC).Value, Sheets("Ammc").Range("B:C"), 2, 0)
+
+On Error Resume Next
+
+If Cells(iRow, ammc).Value = "" Then
+    Cells(iRow, ammc).Value = "#N/A"
+End If
+iRow = iRow + 1
+
+
+Loop
+End Sub
+Sub checkDiv()
+'validate div page
+Sheets("Events").Activate
+Dim iSedol As Integer 'iSedol is row for sedol
+Dim iRow As Integer 'icol is column counter
+Dim divCol, divSCol As Integer 'div column
+Dim divX, divXE As Integer 'begin row and end row for the div table range in div sheet
+Dim divRange As Range
+divCol = 1
+divSCol = 1
+iRow = 7
+
+'get divX and divXE, begin row and end row
+Sheets("Div").Activate
+divX = Range("A1").End(xlDown).Row + 2
+divXE = Cells(divX, 1).End(xlDown).Row
+
+Do Until Cells(divX, divSCol) = "Source Dividend" 'get the column number of dividend
+divSCol = 1 + divSCol
+Loop
+
+
+Set divRange = Sheets("Div").Range(Cells(divX, 1), Cells(divXE, divSCol))
+
+
+
+Sheets("Events").Activate
+
+
+Do Until Cells(6, divCol).Value = "div"  'search column for div
+divCol = divCol + 1
+Loop 'end find divCol column
+
+iSedol = 1
+'loop through table head in row 6 to find the "RIC" column
+Do Until Cells(6, iSedol).Value = "Ammc"
+iSedol = iSedol + 1
+Loop 'end find iSedol
+
+Do Until Cells(iRow, iSedol).Value = "" 'loop through the ammc sedol list till its empty
+
+'vlookup div from div sheet by sedol
+On Error Resume Next
+Cells(iRow, divCol).Value = Application.WorksheetFunction.VLookup(Cells(iRow, iSedol).Value, divRange, divSCol, 0)
+
+If Cells(iRow, divCol).Value = "" Then
+    Cells(iRow, divCol).Value = "#N/A"
+End If
+iRow = iRow + 1
+
+
+
+Loop
+
+
+End Sub 'end validate checkDiv
+'''''''''''''''''''''''''''''''''''''''''''
+Sub checkDiv1()
+'validate T+1 Div
+
+'validate div page
+Sheets("Events").Activate
+Dim iSedol As Integer 'iSedol is row for sedol
+Dim iRow As Integer 'icol is column counter
+Dim div1Col, divSCol As Integer 'div column
+Dim divX, divXE As Integer 'begin row and end row for the div table range in div sheet
+Dim divRange As Range
+div1Col = 1
+divSCol = 1
+iRow = 7
+
+'get divX and divXE, begin row and end row
+Sheets("Div+1").Activate
+divX = Range("A1").End(xlDown).Row + 2
+divXE = Cells(divX, 1).End(xlDown).Row
+
+Do Until Cells(divX, divSCol) = "Source Dividend" 'get the column number of dividend
+divSCol = 1 + divSCol
+Loop
+
+
+Set divRange = Sheets("Div+1").Range(Cells(divX, 1), Cells(divXE, divSCol))
+
+
+
+Sheets("Events").Activate
+
+
+Do Until Cells(6, div1Col).Value = "div+1"  'search column for div
+div1Col = div1Col + 1
+Loop 'end find divCol column
+
+iSedol = 1
+'loop through table head in row 6 to find the "Ammc" column
+Do Until Cells(6, iSedol).Value = "Ammc"
+iSedol = iSedol + 1
+Loop 'end find iSedol
+
+Do Until Cells(iRow, iSedol).Value = "" 'loop through the ammc sedol list till its empty
+
+'vlookup div from div sheet by sedol
+On Error Resume Next
+Cells(iRow, div1Col).Value = Application.VLookup(Cells(iRow, iSedol).Value, divRange, divSCol, 0)
+
+If Cells(iRow, div1Col).Value = "" Then
+    Cells(iRow, div1Col).Value = "#N/A"
+End If
+iRow = iRow + 1
+
+
+Loop
+
+
+
+
+End Sub  'end get div from div+1 sheet
+
+
+Sub diffFind()
+'find the div difference between Eikon and WI's T/T+1
+Dim div, div1, divA, diffA As Integer ' the column
+Dim diffD As Double
+Dim i As Integer 'counter of row
+
+
+
+div = 1
+div1 = 1
+divA = 1
+diffA = 1
+i = 7 ' data content start from row 7
+
+'loop through table head in row 6 to find the "div" column
+Do Until Cells(6, div).Value = "div"
+div = div + 1
+Loop 'end find div column
+
+
+
+'loop through table head in row 6 to find the "div+1" column
+Do Until Cells(6, div1).Value = "div+1"
+div1 = div1 + 1
+Loop 'end find div+1 column
+
+
+'loop through table head in row 6 to find the "Div Amount" column
+Do Until Cells(6, divA).Value = "Div Amount"
+divA = divA + 1
+Loop 'end find div Amount column
+
+'loop through table head in row 6 to find the "Difference" column
+Do Until Cells(6, diffA).Value = "diff"
+diffA = diffA + 1
+Loop 'end find difference column
+
+
+
+Do While Cells(i, 1).Value <> ""  ' loop all contents in the events sheet
+
+   'if both div and div+1 no data, diff =  no data
+    If VarType(Cells(i, div)) = 10 And VarType(Cells(i, div1)) = 10 Then
+        Cells(i, diffA).Value = "#N/A"
+        
+        ElseIf VarType(Cells(i, div).Value) = 10 Then 'if div is null then different = div amount - div+1
+            Cells(i, diffA).Value = Cells(i, divA).Value - Cells(i, div1).Value
+        
+        Else  'If Cells(i, div1).Value = "#N/A" Then  'if div+1 is null then different = div amount - div
+            Cells(i, diffA).Value = Cells(i, divA).Value - Cells(i, div).Value
+               
+        
+        End If
+
+
+i = i + 1
+Loop
+
+
+End Sub  'end find difference
+
+Sub divReverse()
+'company div and event in a reverse vlookup
+
+Sheets("Div").Activate
+Dim divRowS, divRowE, divRowY, divRowYE As Integer ' get the start row a of the div table in div sheet     divRowY,divRowYE are beginning and ending rows of Yesterday's div table starting  row
+Dim divYesRow As Integer 'a counter for input compare results of yesterday's div in the table
+Dim rngYes As Range 'the data range of div in Yesterday_div
+Dim rngEve As Range 'the data range of div in Events
+Dim ammcCol, divSCol As Integer 'ammc col number from Events sheet
+Dim divCol As Integer 'table head in div table
+divCol = 1
+divSCol = 1
+
+''''''''''''''''''''''''''''''''''''''''
+'get data range tabel from Events
+Sheets("Events").Activate
+Dim eveListend As Integer
+eveListend = Sheets("Events").Range("A6").End(xlDown).Row
+ammcCol = 1
+Do Until Cells(6, ammcCol).Value = "Ammc"
+ammcCol = ammcCol + 1
+Loop
+
+Set rngEve = Sheets("Events").Range(Cells(6, ammcCol), Cells(eveListend, ammcCol + 5))
+
+
+'''''''''''''''''''''''''''''''''''''''''''''
+'get the data range from Yesterday_div
+Sheets("Yesterday_Div").Activate
+divRowY = Range("A1").End(xlDown).Row + 2
+divRowYE = Cells(divRowY, 1).End(xlDown).Row
+
+Do Until Cells(divRowY, divSCol) = "Source Dividend" 'get the source dividend from yesterday div
+divSCol = divSCol + 1
+Loop
+
+Set rngYes = Sheets("Yesterday_Div").Range(Cells(divRowY, 1), Cells(divRowYE, divSCol))
+
+
+
+
+
+''''''''''''''''''''''''''''''''''''''''
+'get div data range from Div sheet
+Sheets("Div").Activate
+divRowS = Range("A1").End(xlDown).Row + 2
+divRowE = Cells(divRowS, 1).End(xlDown).Row
+
+
+
+
+
+''''''''''''''''''''''''''''''''''''''''
+Do Until Cells(divRowS, divCol).Value = ""   ' find the end column of the table and set  tables head
+    divCol = divCol + 1
+Loop
+
+'set headers for vlookup results
+Cells(divRowS, divCol + 2).Value = "Sedol-Yesterday"
+Cells(divRowS, divCol + 3).Value = "Div"
+Cells(divRowS, divCol + 4).Value = "Match or Not"
+
+Cells(divRowS, divCol + 6).Value = "Sedol-Events"
+Cells(divRowS, divCol + 7).Value = "Div"
+Cells(divRowS, divCol + 8).Value = "Match or Not"
+
+Range(Cells(divRowS, divCol + 2), Cells(divRowE, divCol + 8)).Select
+
+With Selection.Borders
+    .LineStyle = xlContinuous
+    .Color = vbBlack
+    .Weight = xlThin
+End With
+
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+divRowS = divRowS + 1
+Do Until Cells(divRowS, 1) = ""
+
+'vlookup div sedol by sedol
+On Error Resume Next
+Cells(divRowS, divCol + 6).Value = Application.VLookup(Cells(divRowS, 1).Value, rngEve, 1, 0)  'from Events sheet
+Cells(divRowS, divCol + 2).Value = Application.VLookup(Cells(divRowS, 1).Value, rngYes, 1, 0)   'From Yesterday_Div
+
+If Cells(divRowS, divCol + 6).Value = "" Then 'report events sheet sedol null
+    Cells(divRowS, divCol + 6).Value = "#N/A"
+End If
+If Cells(divRowS, divCol + 2).Value = "" Then 'report Yesterday_Div sedol null
+    Cells(divRowS, divCol + 2).Value = "#N/A"
+End If
+
+'get dividend
+Cells(divRowS, divCol + 7).Value = Application.VLookup(Cells(divRowS, 1).Value, rngEve, 6, 0)  'from Events sheet
+Cells(divRowS, divCol + 3).Value = Application.VLookup(Cells(divRowS, 1).Value, rngYes, divSCol, 0)   'from Yesterday_Div
+
+
+If Cells(divRowS, divCol + 7).Value = "" Then   ' report null div in Events
+    Cells(divRowS, divCol + 7).Value = "#N/A"
+End If
+
+
+If Cells(divRowS, divCol + 3).Value = "" Then   ' report null div in Yesterday_Div
+    Cells(divRowS, divCol + 3).Value = "#N/A"
+End If 'end get div from Events
+
+
+If VarType(Cells(divRowS, divCol + 7).Value) = 10 Then ' compare dividend from Events sheet
+    Cells(divRowS, divCol + 8).Value = "#N/A"
+ ElseIf Cells(divRowS, divCol + 7).Value = Cells(divRowS, divSCol).Value Then
+    Cells(divRowS, divCol + 8).Value = True
+ Else
+    Cells(divRowS, divCol + 8).Value = False
+End If
+'''''''''''''''''''''''''
+
+
+
+If VarType(Cells(divRowS, divCol + 3).Value) = 10 Then  ' compare dividend  from Yesterday_Div
+    Cells(divRowS, divCol + 4).Value = "#N/A"
+ ElseIf Cells(divRowS, divCol + 3).Value = Cells(divRowS, divSCol).Value Then
+  
+    Cells(divRowS, divCol + 4).Value = True
+ Else
+    Cells(divRowS, divCol + 4).Value = False
+End If
+
+
+
+divRowS = divRowS + 1
+Loop ' end compare events and div
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
+
+
+
+
+'autofit columns for better Layout
+
+Columns(divCol + 2).AutoFit
+Columns(divCol + 3).AutoFit
+Columns(divCol + 4).AutoFit
+Columns(divCol + 6).AutoFit
+Columns(divCol + 7).AutoFit
+Columns(divCol + 8).AutoFit
+
+End Sub  'and divReverse
+''''''''
+
+Sub div1Reverse()
+'reverse Vlookup between Div+1 and Events sheet
+Sheets("Div+1").Activate
+Dim divRowS, divRowE As Integer 'get the start row a of the div table in div sheet
+Dim divCol, divSCol As Integer 'table head in div table
+Dim ammcCol As Integer ' column number of ammc in Events sheet
+Dim rngEve As Range 'data range for div vlookup reference in Events sheet
+divCol = 1
+divSCol = 1
+''''''''''''''''''''''''''''''''''''''''
+'get data range tabel from Events
+Sheets("Events").Activate
+Dim eveListend As Integer
+eveListend = Range("A6").End(xlDown).Row
+ammcCol = 1
+Do Until Cells(6, ammcCol).Value = "" Or Cells(6, ammcCol).Value = "Ammc"
+ammcCol = ammcCol + 1
+Loop
+
+Set rngEve = Sheets("Events").Range(Cells(6, ammcCol), Cells(eveListend, ammcCol + 6))
+
+
+
+'get div data range from Div+1 sheet
+Sheets("Div+1").Activate
+divRowS = Range("A1").End(xlDown).Row + 2
+divRowE = Cells(divRowS, 1).End(xlDown).Row
+
+'get source dividend column
+Do Until Cells(divRowS, divSCol) = "Source Dividend"
+divSCol = divSCol + 1
+Loop
+
+
+Do Until Cells(divRowS, divCol).Value = ""   ' find the end column of the table and set  tables head
+    divCol = divCol + 1
+Loop
+
+
+'set headers for vlookup results
+Cells(divRowS, divCol + 2).Value = "Sedol -Events"
+Cells(divRowS, divCol + 3).Value = "Div"
+Cells(divRowS, divCol + 4).Value = "Match or Not"
+
+Range(Cells(divRowS, divCol + 2), Cells(divRowE, divCol + 4)).Select
+
+With Selection.Borders
+    .LineStyle = xlContinuous
+    .Color = vbBlack
+    .Weight = xlThin
+End With
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+divRowS = divRowS + 1
+Do Until Cells(divRowS, 1) = ""
+
+'vlookup div sedol by sedol
+On Error Resume Next
+Cells(divRowS, divCol + 2).Value = Application.VLookup(Cells(divRowS, 1).Value, rngEve, 1, 0)  'from Events sheet
+
+
+
+If Cells(divRowS, divCol + 2).Value = "" Then 'report Events sheet sedol null
+    Cells(divRowS, divCol + 2).Value = "#N/A"
+End If
+
+'get dividend
+Cells(divRowS, divCol + 3).Value = Application.VLookup(Cells(divRowS, 1).Value, rngEve, 6, 0)  'from Events sheet
+
+
+If Cells(divRowS, divCol + 3).Value = "" Then   ' report null div in Events
+    Cells(divRowS, divCol + 3).Value = "#N/A"
+End If
+
+'end get div from Events
+
+
+
+
+
+
+If VarType(Cells(divRowS, divCol + 3).Value) = 10 Then  ' compare dividend  from Event
+    Cells(divRowS, divCol + 4).Value = "#N/A"
+ ElseIf Cells(divRowS, divCol + 3).Value = Cells(divRowS, divSCol).Value Then
+  
+    Cells(divRowS, divCol + 4).Value = True
+ Else
+    Cells(divRowS, divCol + 4).Value = False
+End If
+
+
+
+divRowS = divRowS + 1
+Loop ' end compare events and div
+
+End Sub
+
+
+
+
